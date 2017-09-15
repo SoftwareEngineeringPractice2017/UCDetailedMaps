@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">UCDetailedMaps</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_floor_plans">FloorPlansActivity</string>
+</resources>
