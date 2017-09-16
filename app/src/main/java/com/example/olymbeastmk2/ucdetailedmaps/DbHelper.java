@@ -25,7 +25,7 @@ import java.util.ArrayList;
 public class DbHelper extends SQLiteOpenHelper
 {
     public static final String BUILDING_TABLE = "buildings";
-    public static final String BUILDING_ID = "id";
+    public static final String BUILDING_ID = "buildingid";
     public static final String BUILDING_NAME = "name";
 
     public static final String OUTLINE_TABLE = "outlines";
@@ -41,10 +41,13 @@ public class DbHelper extends SQLiteOpenHelper
 
     public static final String ICONS_TABLE = "icons";
     public static final String ICONS_ID = "id";
-    public static final String ICONS_TYPE = "type";
-    public static final String ICONS_LABEL = "label";
+    public static final String ICONS_TYPE_ID = "typeid";
     public static final String ICONS_LAT = "lat";
     public static final String ICONS_LNG = "lng";
+
+    public static final String ICON_TYPE_TABLE = "icontypes";
+    public static final String ICON_LABEL = "iconlabel";
+
 
     public DbHelper( Context context, String name, SQLiteDatabase.CursorFactory factory, int version )
     {
@@ -77,10 +80,13 @@ public class DbHelper extends SQLiteOpenHelper
         //Create Icons table.
         db.execSQL( "create table " + ICONS_TABLE + "(" +
                 ICONS_ID + " integer primary key, " +
-                ICONS_TYPE + " text, " +
-                ICONS_LABEL + " text, " +
+                ICONS_TYPE_ID + " text, " +
                 ICONS_LAT + " double, " +
                 ICONS_LNG + " double)");
+
+        // Create Icons Type Table
+        //db.execSQL( "create table " + ICONS_TABLE + "(" +
+            //    ICON_TYPE_ID + " integer primary key")
 
         // Commenting out Fill for the moment as we are getting data from the CSV
         // Fill();
