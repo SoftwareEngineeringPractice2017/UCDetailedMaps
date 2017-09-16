@@ -45,8 +45,8 @@ public class DbHelper extends SQLiteOpenHelper
     public static final String ICONS_LAT = "lat";
     public static final String ICONS_LNG = "lng";
 
-    public static final String ICON_TYPE_TABLE = "icontypes";
-    public static final String ICON_LABEL = "iconlabel";
+    public static final String ICONS_TYPE_TABLE = "icontypes";
+    public static final String ICONS_LABEL = "iconlabel";
 
 
     public DbHelper( Context context, String name, SQLiteDatabase.CursorFactory factory, int version )
@@ -80,13 +80,14 @@ public class DbHelper extends SQLiteOpenHelper
         //Create Icons table.
         db.execSQL( "create table " + ICONS_TABLE + "(" +
                 ICONS_ID + " integer primary key, " +
-                ICONS_TYPE_ID + " text, " +
+                ICONS_TYPE_ID + " integer, " +
                 ICONS_LAT + " double, " +
                 ICONS_LNG + " double)");
 
         // Create Icons Type Table
-        //db.execSQL( "create table " + ICONS_TABLE + "(" +
-            //    ICON_TYPE_ID + " integer primary key")
+        db.execSQL( "create table " + ICONS_TABLE + "(" +
+                ICONS_TYPE_ID + " integer primary key autoincrement, " +
+                ICONS_LABEL + " text, ");
 
         // Commenting out Fill for the moment as we are getting data from the CSV
         // Fill();
