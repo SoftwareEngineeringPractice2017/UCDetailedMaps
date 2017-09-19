@@ -42,11 +42,13 @@ public class DbHelper extends SQLiteOpenHelper
     public static final String ICONS_TABLE = "icons";
     public static final String ICONS_ID = "id";
     public static final String ICONS_TYPE_ID = "typeid";
+    public static final String ICONS_LABEL = "label";
     public static final String ICONS_LAT = "lat";
     public static final String ICONS_LNG = "lng";
 
-    public static final String ICONS_TYPE_TABLE = "icontypes";
-    public static final String ICONS_LABEL = "iconlabel";
+    public static final String ICONTYPES_TABLE = "icontypes";
+    public static final String ICONTYPES_ID = "id";
+    public static final String ICONTYPES_NAME = "name";
 
 
     public DbHelper( Context context, String name, SQLiteDatabase.CursorFactory factory, int version )
@@ -57,19 +59,41 @@ public class DbHelper extends SQLiteOpenHelper
     @Override
     public void onCreate( SQLiteDatabase db )
     {
+       BuildEverything();
+    }
+
+    @Override
+    public void onUpgrade( SQLiteDatabase db, int oldVersion, int newVersion )
+    {
+        ClearEverything();
+    }
+
+    public void ClearEverything()
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL( "drop table if exists " + BUILDING_TABLE );
+        db.execSQL( "drop table if exists " + OUTLINE_TABLE );
+        db.execSQL( "drop table if exists " + ENTRANCES_TABLE );
+        db.execSQL( "drop table if exists " + ICONS_TABLE );
+        db.execSQL( "drop table if exists " + ICONTYPES_TABLE );
+    }
+
+    public void BuildEverything()
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
         //Create Buildings table.
         db.execSQL( "create table " + BUILDING_TABLE + "(" +
                 BUILDING_ID + " integer primary key, " +
-                BUILDING_NAME + "text)" );
+                BUILDING_NAME + " text)" );
 
         //Create Outlines table.
         db.execSQL( "create table " + OUTLINE_TABLE + "(" +
                 OUTLINE_ID + " integer primary key autoincrement, " +
                 OUTLINE_BUILDING_ID + " integer, " +
                 OUTLINE_LAT + " double, " +
-                OUTLINE_LNG + " double,"
+                OUTLINE_LNG + " double," +
                 // OUTLINE_BUILDING_ID is a foreign key to say which points belong to which build
-                + " FOREIGN KEY (" + OUTLINE_BUILDING_ID + ") REFERENCES " + BUILDING_TABLE + "(" + BUILDING_ID + "));" );
+                " FOREIGN KEY (" + OUTLINE_BUILDING_ID + ") REFERENCES " + BUILDING_TABLE + "(" + BUILDING_ID + "));" );
 
         //Create Entries table.
         db.execSQL( "create table " + ENTRANCES_TABLE + "(" +
@@ -77,29 +101,22 @@ public class DbHelper extends SQLiteOpenHelper
                 ENTRANCES_LAT + " double, " +
                 ENTRANCES_LNG + " double)");
 
+
         //Create Icons table.
         db.execSQL( "create table " + ICONS_TABLE + "(" +
                 ICONS_ID + " integer primary key, " +
                 ICONS_TYPE_ID + " integer, " +
+                ICONS_LABEL + " text, " +
                 ICONS_LAT + " double, " +
-                ICONS_LNG + " double)");
+                ICONS_LNG + " double," +
+                // ICONS_TYPE_ID is a foreign key to link to a location on ICONTYPES table.
+                " FOREIGN KEY (" + ICONS_TYPE_ID + ") REFERENCES " + ICONTYPES_TABLE + "(" + ICONTYPES_ID + "));" );
 
-        // Create Icons Type Table
-        db.execSQL( "create table " + ICONS_TABLE + "(" +
-                ICONS_TYPE_ID + " integer primary key autoincrement, " +
-                ICONS_LABEL + " text, ");
+        // Create IconTypes table.
+        db.execSQL( "create table " + ICONTYPES_TABLE + "(" +
+                ICONTYPES_ID + " integer primary key autoincrement, " +
+                ICONTYPES_NAME + " text)");
 
-        // Commenting out Fill for the moment as we are getting data from the CSV
-        // Fill();
-    }
-
-    @Override
-    public void onUpgrade( SQLiteDatabase db, int oldVersion, int newVersion )
-    {
-        db.execSQL( "drop table if exists " + BUILDING_TABLE );
-        db.execSQL( "drop table if exists " + OUTLINE_TABLE );
-        db.execSQL( "drop table if exists " + ENTRANCES_TABLE );
-        db.execSQL( "drop table if exists " + ICONS_TABLE );
     }
 
     // Imports a CSV file about building information ( Outlines and centre ) and loads it into the database
@@ -193,7 +210,8 @@ public class DbHelper extends SQLiteOpenHelper
 
         while(res.isAfterLast() == false)
         {
-            output.add(new Building(res.getInt( res.getColumnIndex( BUILDING_ID )), this));
+            //Log.e( "UCDetailedMapsApp", res.getString(0) );
+            output.add(new Building( res.getInt( res.getColumnIndex( BUILDING_ID ) ), this));
             res.moveToNext();
         }
 
@@ -214,7 +232,5 @@ public class DbHelper extends SQLiteOpenHelper
         }
 
         return output;
-
-
     }
 }

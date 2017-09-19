@@ -11,7 +11,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
@@ -63,7 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMaxZoomPreference( 27 );
         mMap.setMinZoomPreference( 12 );
 
-        // Add a marker in Sydney and move the camera
+        // Add a marker in UC Campus
         LatLng Building22 = new LatLng( -35.240489, 149.088301 );
         LatLng UCBruceCampus = new LatLng( -35.238569, 149.086063 );
         mMap.addMarker( new MarkerOptions().position( Building22 ).title( "Building 22" ) );
@@ -74,6 +76,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Initialize Database helper for all database needs
         DbHelper dbBuildHelp = new DbHelper( this, "UCMapsDB", null, 1 );
+
+        //Temporary code for development. The database is constant even after updates in code.
+        //Therefore it is necessary to rebuild it each time the app is debugged, in case of changes.
+        dbBuildHelp.ClearEverything();
+        dbBuildHelp.BuildEverything();
+
 
         // Get the resources ( mainly for the CSV file at the moment )
         resources = getResources();
@@ -111,5 +119,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Add the Polygon to Google maps
             Polygon bPoly = mMap.addPolygon( bOptions );
         }
+
+        /*
+
+        ArrayList<Icon> tmpIconArr = dbBuildHelp.GetIcons();
+
+        for(Icon i : tmpIconArr)
+        {
+            //The icon to display for this location.
+            int icon_icon = R.mipmap.ic_launcher; //R.mpmap.ic_launcher is temporary until icons are added.
+
+            //Set icon_icon to the right icon.
+            switch(i.getType())
+            {
+                case "ATM" :
+                    //icon_icon = R.mipmap.XXXXX;
+                    break;
+                case "Elevator" :
+                    //icon_icon = R.mipmap.XXXXX;
+                    break;
+                default :
+                    //icon_icon = R.mipmap.ERROR_ICON;
+                    break;
+            }
+
+            final Marker iconMarker = mMap.addMarker(new MarkerOptions()
+                .position(i.getLocation())
+                .icon(BitmapDescriptorFactory.fromResource(icon_icon))
+            );
+
+        }
+
+        */
     }
 }
