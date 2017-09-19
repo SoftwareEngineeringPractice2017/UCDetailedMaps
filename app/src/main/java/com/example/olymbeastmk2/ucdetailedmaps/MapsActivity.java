@@ -3,9 +3,15 @@ package com.example.olymbeastmk2.ucdetailedmaps;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,6 +37,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // The package name for easy use
     public static String PACKAGE_NAME;
 
+    // Drawer stuff
+    private String[] titles;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
@@ -43,7 +54,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = ( SupportMapFragment ) getSupportFragmentManager()
                 .findFragmentById( R.id.map );
+
+        //Drawer stuff
+        titles = new String[] {"One", "Two", "Three"};
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+
+
+        ArrayList<String> asd = new ArrayList<String>();
+        for(String s : titles)
+        {
+            asd.add(s);
+        }
+        MenuAdapter adapter = new MenuAdapter(this, R.layout.drawer_list_item, asd);
+        mDrawerList.setAdapter(adapter);
+
+        FloatingActionButton mFAB = (FloatingActionButton) findViewById(R.id.floatingActionButton);
+        mFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDrawerLayout.openDrawer(Gravity.LEFT);
+            }
+        });
+
         mapFragment.getMapAsync( this );
+
     }
 
 
@@ -152,4 +187,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         */
     }
+
 }
