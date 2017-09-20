@@ -323,6 +323,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //The icon to display for this location.
                 int icon_icon = R.mipmap.ic_launcher; //R.mpmap.ic_launcher is temporary until icons are added.
 
+                // Boolean to say whether to add the marker or not
+                boolean bAddMarker = true;
+
                 //Set icon_icon to the right icon.
                 switch(i.getType())
                 {
@@ -336,14 +339,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         icon_icon = R.mipmap.telephone;
                         break;
                     default :
-                        icon_icon = R.mipmap.ic_launcher;
+                        bAddMarker = false;
                         break;
                 }
 
-                final Marker iconMarker = mMap.addMarker(new MarkerOptions()
-                        .position(i.getLocation())
-                        .icon(BitmapDescriptorFactory.fromResource(icon_icon))
-                );
+                if( bAddMarker )
+                {
+                    final Marker iconMarker = mMap.addMarker(new MarkerOptions()
+                            .position(i.getLocation())
+                            .icon(BitmapDescriptorFactory.fromResource(icon_icon))
+                    );
+                }
             }
         }
 
