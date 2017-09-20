@@ -18,6 +18,8 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -41,6 +43,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
 
     //Location Stuff
+    private FusedLocationProviderClient mFusedLocationClient;
 
     //Database Stuff
     // A Handle to the applications resources
@@ -71,6 +74,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = ( SupportMapFragment ) getSupportFragmentManager()
                 .findFragmentById( R.id.map );
 
+
+        // Location stuff.
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Setup the drawer.
         InitializeDrawer();
 
         mapFragment.getMapAsync( this );
