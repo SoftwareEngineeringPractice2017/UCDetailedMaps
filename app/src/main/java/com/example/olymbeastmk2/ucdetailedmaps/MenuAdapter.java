@@ -17,12 +17,13 @@ import java.util.ArrayList;
 
 public class MenuAdapter extends ArrayAdapter<String>{
 
-    ArrayList<String> elements = new ArrayList<String>();
+    ArrayList<MenuItem> elements = new ArrayList<MenuItem>();
 
-    public MenuAdapter(Context context, int resource, ArrayList<String> objects) {
-        super (context, resource, objects);
+    public MenuAdapter(Context context, int resource, ArrayList<String> superObjects, ArrayList<MenuItem> objects) {
+        super (context, resource, superObjects);
         elements = objects;
     }
+
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -36,7 +37,7 @@ public class MenuAdapter extends ArrayAdapter<String>{
         checkBox.setChecked(true);
 
         TextView label = (TextView) convertView.findViewById(R.id.textView);
-        label.setText(elements.get(position));
+        label.setText(elements.get(position).text);
 
         return convertView;
     }

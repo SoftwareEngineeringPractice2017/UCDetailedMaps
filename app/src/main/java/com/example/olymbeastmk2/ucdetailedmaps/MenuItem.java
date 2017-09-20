@@ -12,10 +12,17 @@ public class MenuItem implements Comparable<MenuItem> {
     ItemType type;
     String text;
 
-    public MenuItem(int _id, ItemType _type, String _text)
+    public MenuItem(int _id,  String _text)
     {
         id = _id;
-        type = _type;
+        type = ItemType.Building;
+        text = _text;
+    }
+
+    public MenuItem(String _text)
+    {
+        id = -1;
+        type = ItemType.Icon;
         text = _text;
     }
 

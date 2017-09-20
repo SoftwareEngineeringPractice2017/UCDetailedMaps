@@ -27,6 +27,9 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Dictionary;
+import java.util.HashMap;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 {
@@ -78,8 +81,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         {
             asd.add(s);
         }
-        MenuAdapter adapter = new MenuAdapter(this, R.layout.drawer_list_item, asd);
-        mDrawerList.setAdapter(adapter);
+        //MenuAdapter adapter = new MenuAdapter(this, R.layout.drawer_list_item, asd);
+        //mDrawerList.setAdapter(adapter);
 
         FloatingActionButton mFAB = (FloatingActionButton) findViewById(R.id.floatingActionButton);
         mFAB.setOnClickListener(new View.OnClickListener() {
@@ -98,11 +101,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                EditText SearchBox = (EditText) findViewById(R.id.editText);
-                String search = SearchBox.getText().toString();
-
-
-
+                //refreshDrawerListView();
             }
 
             @Override
@@ -118,11 +117,78 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    public void refreshDrawerListView()
+    {
+        EditText SearchBox = (EditText) findViewById(R.id.editText);
+
+        String search = SearchBox.getText().toString();
+
+        ArrayList<MenuItem> menuItems = FilterMenuItems(GetMenuItems(), search);
+
+        MenuAdapter menuAdapter = new MenuAdapter(this,
+                R.layout.drawer_list_item,
+                MenuItemsNames(menuItems),
+                menuItems);
+
+        mDrawerList.setAdapter(menuAdapter);
+    }
+
     private ArrayList<MenuItem> GetMenuItems()
     {
+        //ArrayList to be loaded and returned.
         ArrayList<MenuItem> output = new ArrayList<MenuItem>();
 
+        //Instance the DBHelper class.
+        DbHelper dbBuildHelp = new DbHelper( this, "UCMapsDB", null, 1 );
+
+        //Instance a collection of all the buildings and icons in the database.
+        ArrayList<Building> buildings = dbBuildHelp.GetBuildings();
+        HashMap<String, ArrayList<Icon>> icons = new HashMap<String, ArrayList<Icon>>(); // = dbBuildHelp.GetIcons();
+
+        //Add each building name as a MenuItem.
+        for(Building b : buildings)
+        {
+            output.add(new MenuItem(b.getID(), b.getName()));
+        }
+
+        //Each key in icons represents an IconType.
+        //Cylce through each IconType and add each as a new MenuItem.
+        for(String s : icons.keySet())
+        {
+            output.add(new MenuItem(s));
+        }
+
+        //Sort output alphabetically.
+        Collections.sort(output);
+
         return output;
+    }
+
+    private ArrayList<MenuItem> FilterMenuItems(ArrayList<MenuItem> input, String filter)
+    {
+        //ArrayList to be loaded with MenuItems that start with filter.
+        ArrayList<MenuItem> output = new ArrayList<MenuItem>();
+
+        //Cycle through each MenuItem in input.
+        for(MenuItem m : input)
+        {
+            if(m.text.startsWith(filter))
+            {
+                output.add(m);
+            }
+        }
+
+        return output;
+    }
+
+    private ArrayList<String> MenuItemsNames(ArrayList<MenuItem> input)
+    {
+        ArrayList<String> objects = new ArrayList<String>();
+        for(MenuItem m : input)
+        {
+            objects.add(m.text);
+        }
+        return objects;
     }
 
 
