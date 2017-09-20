@@ -53,7 +53,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //Local stuff
     private ArrayList<Building> buildings;
-    //private HashMap<String, ArrayList<Icon>> icons;
+    private HashMap<String, ArrayList<Icon>> icons;
 
     @Override
     protected void onCreate( Bundle savedInstanceState )
@@ -76,19 +76,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void InitializeDrawer()
     {
-        titles = new String[] {"One", "Two", "Three"};
-
         //Drawer Layout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
-        ArrayList<String> asd = new ArrayList<String>();
-        for(String s : titles)
-        {
-            asd.add(s);
-        }
-        //MenuAdapter adapter = new MenuAdapter(this, R.layout.drawer_list_item, asd);
-        //mDrawerList.setAdapter(adapter);
+
 
         FloatingActionButton mFAB = (FloatingActionButton) findViewById(R.id.floatingActionButton);
         mFAB.setOnClickListener(new View.OnClickListener() {
@@ -98,7 +90,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-
+        //Clear the drawer when it is opened.
         mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
@@ -107,17 +99,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                refreshDrawerListView();
+
+
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
-
+                EditText SearchBox = (EditText) findViewById(R.id.editText);
+                SearchBox.setText("");
             }
 
             @Override
             public void onDrawerStateChanged(int newState) {
-
+                refreshDrawerListView();
             }
         });
 
@@ -289,15 +283,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Polygon bPoly = mMap.addPolygon( bOptions );
         }
 
-        /*
 
-        ArrayList<Icon> tmpIconArr = dbBuildHelp.GetIcons();
 
-        for(Icon i : tmpIconArr)
+        icons = dbBuildHelp.GetIcons();
+
+        for(String s : icons.keySet())
         {
-            //The icon to display for this location.
-            int icon_icon = R.mipmap.ic_launcher; //R.mpmap.ic_launcher is temporary until icons are added.
+            for(Icon i : icons.get(s))
+            {
+                //The icon to display for this location.
+                int icon_icon = R.mipmap.ic_launcher; //R.mpmap.ic_launcher is temporary until icons are added.
 
+            /* CODE TEMPLATE FOR ICON FILES
             //Set icon_icon to the right icon.
             switch(i.getType())
             {
@@ -311,15 +308,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     //icon_icon = R.mipmap.ERROR_ICON;
                     break;
             }
-
-            final Marker iconMarker = mMap.addMarker(new MarkerOptions()
-                .position(i.getLocation())
-                .icon(BitmapDescriptorFactory.fromResource(icon_icon))
-            );
-
+            */
+                final Marker iconMarker = mMap.addMarker(new MarkerOptions()
+                        .position(i.getLocation())
+                        .icon(BitmapDescriptorFactory.fromResource(icon_icon))
+                );
+            }
         }
 
-        */
+
+
     }
 
 }
