@@ -13,6 +13,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -133,6 +134,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                MenuItemClicked(i);
+            }
+        });
     }
 
     public void refreshDrawerListView()
@@ -204,6 +212,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             objects.add(m.text);
         }
         return objects;
+    }
+
+    private void MenuItemClicked(int position)
+    {
+        float zoomLevel = 9;
+        LatLng location = new LatLng(0,0);;
+
+        MenuItem menuItem = currentMenu.get(position);
+
+        if(menuItem.type == MenuItem.ItemType.Building)
+        {
+            for (Building b : buildings)
+            {
+                if(b.getID() == menuItem.id)
+                {
+                    location = LatLngTools.getCenter(b.getOutline());
+                }
+            }
+        }
+        else
+        {
+
+        }
+
+        mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( location, zoomLevel ) );
     }
 
 
