@@ -46,10 +46,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static String PACKAGE_NAME;
 
     // Drawer stuff
-    private String[] titles;
     private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle mDrawerToggle;
     private ListView mDrawerList;
+    private ArrayList<MenuItem> menuItems;
+    private ArrayList<MenuItem> currentMenu;
 
     //Local stuff
     private ArrayList<Building> buildings;
@@ -133,7 +133,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-
     }
 
     public void refreshDrawerListView()
@@ -142,12 +141,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         String search = SearchBox.getText().toString();
 
-        ArrayList<MenuItem> menuItems = FilterMenuItems(GetMenuItems(), search);
+        //This should be moved at a later point. Should only be called once.
+        menuItems = GetMenuItems();
+
+        currentMenu = FilterMenuItems(menuItems, search);
 
         MenuAdapter menuAdapter = new MenuAdapter(this,
                 R.layout.drawer_list_item,
-                MenuItemsNames(menuItems),
-                menuItems);
+                MenuItemsNames(currentMenu),
+                currentMenu);
 
         mDrawerList.setAdapter(menuAdapter);
     }
@@ -156,12 +158,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         //ArrayList to be loaded and returned.
         ArrayList<MenuItem> output = new ArrayList<MenuItem>();
-
-        //Instance the DBHelper class.
-        DbHelper dbBuildHelp = new DbHelper( this, "UCMapsDB", null, 1 );
-
-        //Instance a collection of all the buildings and icons in the database.
-        HashMap<String, ArrayList<Icon>> icons = new HashMap<String, ArrayList<Icon>>(); // = dbBuildHelp.GetIcons();
 
         //Add each building name as a MenuItem.
         for(Building b : buildings)
