@@ -53,11 +53,7 @@ public class Icon
         Cursor res2 = parent.getReadableDatabase().rawQuery("select * from " + DbHelper.ICONTYPES_TABLE + " where " + DbHelper.ICONTYPES_ID + "=" + Integer.toString( typeID ), null);
         res2.moveToFirst();
 
-        int COLUMNINDEX = res.getColumnIndex( DbHelper.ICONTYPES_NAME );
-
-        Log.e( "UCDetailedMaps", Integer.toString( COLUMNINDEX ) );
-
-        type = res2.getString(res.getColumnIndex( DbHelper.ICONTYPES_NAME ) );
+        type = res2.getString(res2.getColumnIndex( DbHelper.ICONTYPES_NAME ) );
         hasType = true;
         return type;
     }
