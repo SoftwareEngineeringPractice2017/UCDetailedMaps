@@ -275,8 +275,8 @@ public class DbHelper extends SQLiteOpenHelper
                 ContentValues contentValues = new ContentValues();
 
                 // Read in ID and associated icon label
-                contentValues.put( ICONS_TYPE_ID, tmpString[0] );
-                contentValues.put( ICONS_LABEL, tmpString[1] );
+                contentValues.put( ICONTYPES_ID, tmpString[0] );
+                contentValues.put( ICONTYPES_NAME, tmpString[1] );
 
                 // PUSH IT
                 db.insert(ICONTYPES_TABLE, null, contentValues);
@@ -311,7 +311,7 @@ public class DbHelper extends SQLiteOpenHelper
                 contentValues.put( ICONS_LAT, tmpString[2] );
                 contentValues.put( ICONS_LNG, tmpString[3] );
 
-                db.insert(BUILDING_TABLE, null, contentValues);
+                db.insert(ICONS_TABLE, null, contentValues);
             }
         }
         catch( IOException exception )

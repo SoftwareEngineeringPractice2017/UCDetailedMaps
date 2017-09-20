@@ -1,6 +1,7 @@
 package com.example.olymbeastmk2.ucdetailedmaps;
 
 import android.database.Cursor;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -51,6 +52,10 @@ public class Icon
         //Use the TYPE_ID to get the ICONTYPES_NAME.
         Cursor res2 = parent.getReadableDatabase().rawQuery("select * from " + DbHelper.ICONTYPES_TABLE + " where " + DbHelper.ICONTYPES_ID + "=" + Integer.toString( typeID ), null);
         res2.moveToFirst();
+
+        int COLUMNINDEX = res.getColumnIndex( DbHelper.ICONTYPES_NAME );
+
+        Log.e( "UCDetailedMaps", Integer.toString( COLUMNINDEX ) );
 
         type = res2.getString(res.getColumnIndex( DbHelper.ICONTYPES_NAME ) );
         hasType = true;
