@@ -197,7 +197,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Cycle through each MenuItem in input.
         for(MenuItem m : input)
         {
-            if(m.text.toLowerCase().startsWith(filter))
+            if(m.text.toLowerCase().contains(filter))
             {
                 output.add(m);
             }
