@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashMap;
 
 /**
  * Created by Olymbeastmk2 on 09-Sep-17.
@@ -246,17 +248,28 @@ public class DbHelper extends SQLiteOpenHelper
         return output;
     }
 
-    //TODO: Return Dictionary<IconType, Icon> instead.
-    public ArrayList<Icon> GetIcons()
+    public HashMap<String, ArrayList<Icon>> GetIcons()
     {
-        ArrayList<Icon> output = new ArrayList<Icon>();
+        HashMap<String, ArrayList<Icon>> output = new HashMap<String, ArrayList<Icon>>();
 
         Cursor res = getReadableDatabase().rawQuery("select * from " + ICONS_TABLE, null);
         res.moveToFirst();
 
         while(res.isAfterLast() == false)
         {
-            output.add(new Icon(res.getInt( res.getColumnIndex( ICONS_ID )), this));
+            Icon tempIcon = new Icon(res.getInt( res.getColumnIndex( ICONS_ID )), this);
+            String iconType = tempIcon.getType();
+
+            if(output.containsKey(iconType))
+            {
+                output.get(iconType).add(tempIcon);
+            }
+            else
+            {
+                output.put(iconType, new ArrayList<Icon>());
+                output.get(iconType).add(tempIcon);
+            }
+
             res.moveToNext();
         }
 

@@ -19,10 +19,23 @@ public class Building
     private int id;
     private DbHelper parent;
 
+    private String name;
+    private boolean hasName;
+
+    private ArrayList<LatLng> outline;
+    private boolean hasOutline;
+
+    private ArrayList<LatLng> entries;
+    private boolean hasEntries;
+
     public Building(int _id, DbHelper _parent)
     {
         id = _id;
         parent = _parent;
+
+        hasName = false;
+        hasOutline = false;
+        hasEntries = false;
     }
 
     public int getID()
@@ -33,17 +46,28 @@ public class Building
 
     public String getName()
     {
+        if(hasName)
+        {
+            return name;
+        }
         Cursor res = parent.getReadableDatabase().rawQuery("select * from " + DbHelper.BUILDING_TABLE + " where " + DbHelper.BUILDING_ID + "=" + Integer.toString( id ), null);
         res.moveToFirst();
-        return res.getString( res.getColumnIndex( DbHelper.BUILDING_NAME ) );
+        name = res.getString( res.getColumnIndex( DbHelper.BUILDING_NAME ) );
+        hasName = true;
+        return name;
     }
 
     public ArrayList<LatLng> getOutline()
     {
+        if(hasOutline)
+        {
+            return outline;
+        }
+
         Cursor res = parent.getReadableDatabase().rawQuery("select * from " + DbHelper.OUTLINE_TABLE + " where " + DbHelper.OUTLINE_BUILDING_ID + "=" + Integer.toString( id ), null );
         res.moveToFirst();
 
-        ArrayList<LatLng> outline = new ArrayList<LatLng>();
+        outline = new ArrayList<LatLng>();
         while(res.isAfterLast() == false)
         {
             double latitude, longitude;
@@ -52,15 +76,21 @@ public class Building
             outline.add(new LatLng( latitude, longitude ));
             res.moveToNext();
         }
+
+        hasOutline = true;
         return outline;
     }
 
     public ArrayList<LatLng> getEntries()
     {
+        if(hasEntries)
+        {
+            return entries;
+        }
         Cursor res = parent.getReadableDatabase().rawQuery("select * from " + DbHelper.ENTRANCES_TABLE + " where " + DbHelper.ENTRANCES_BUILDING + "=" + Integer.toString( id ), null );
         res.moveToFirst();
 
-        ArrayList<LatLng> entries = new ArrayList<LatLng>();
+        entries = new ArrayList<LatLng>();
         while(res.isAfterLast() == false)
         {
             double latitude, longitude;
@@ -69,6 +99,8 @@ public class Building
             entries.add(new LatLng( latitude, longitude ));
             res.moveToNext();
         }
+
+        hasEntries = true;
         return entries;
     }
 }
