@@ -166,7 +166,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         //Each key in icons represents an IconType.
-        //Cylce through each IconType and add each as a new MenuItem.
+        //Cycle through each IconType and add each as a new MenuItem.
         for(String s : icons.keySet())
         {
             output.add(new MenuItem(s));
@@ -290,21 +290,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //The icon to display for this location.
                 int icon_icon = R.mipmap.ic_launcher; //R.mpmap.ic_launcher is temporary until icons are added.
 
-            /* CODE TEMPLATE FOR ICON FILES
-            //Set icon_icon to the right icon.
-            switch(i.getType())
-            {
-                case "ATM" :
-                    //icon_icon = R.mipmap.XXXXX;
-                    break;
-                case "Elevator" :
-                    //icon_icon = R.mipmap.XXXXX;
-                    break;
-                default :
-                    //icon_icon = R.mipmap.ERROR_ICON;
-                    break;
-            }
-            */
+                //Set icon_icon to the right icon.
+                switch(i.getType())
+                {
+                    case "Water" :
+                        icon_icon = R.mipmap.water;
+                        break;
+                    case "Casual Parking" :
+                        icon_icon = R.mipmap.casualparking;
+                        break;
+                    case "Telephone" :
+                        icon_icon = R.mipmap.telephone;
+                        break;
+                    default :
+                        icon_icon = R.mipmap.ic_launcher;
+                        break;
+                }
+
                 final Marker iconMarker = mMap.addMarker(new MarkerOptions()
                         .position(i.getLocation())
                         .icon(BitmapDescriptorFactory.fromResource(icon_icon))
