@@ -161,7 +161,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         dbBuildHelp.ClearEverything();
         dbBuildHelp.BuildEverything();
 
-
         // Get the resources ( mainly for the CSV file at the moment )
         resources = getResources();
 

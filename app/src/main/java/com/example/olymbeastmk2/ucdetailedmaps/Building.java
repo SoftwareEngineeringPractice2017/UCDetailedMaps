@@ -6,6 +6,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
+// HELLO RILEY, ITS GREG HERE. THE CODE IS 'PINEAPPLE' :P
 
 /**
  * Created by Olymbeastmk2 on 09-Sep-17.
