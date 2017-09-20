@@ -143,6 +143,9 @@ public class DbHelper extends SQLiteOpenHelper
         // Delete all records in the Database ( Buildings table AND Outlines Table ) to make room for the new data
         db.execSQL( "delete from " + BUILDING_TABLE );
         db.execSQL( "delete from " + OUTLINE_TABLE );
+        db.execSQL( "delete from " + ENTRANCES_TABLE );
+        db.execSQL( "delete from " + ICONS_TABLE );
+        db.execSQL( "delete from " + ICONTYPES_TABLE );
 
         try
         {
@@ -155,11 +158,13 @@ public class DbHelper extends SQLiteOpenHelper
             {
                 // Temporary string to hold each element separated by a comma in the CSV file
 
-                //Remove trailing commas:
-                while(line.endsWith(",,"))
+                //Remove trailing commas
+                while(line.endsWith(","))
                 {
-                    line = line.substring(0, line.length() - 3);
+                    line = line.substring(0, line.length() - 2);
                 }
+
+                Log.d( "UCDetailedMaps", line );
 
                 String[] tmpString = line.split( "," );
 
@@ -189,8 +194,8 @@ public class DbHelper extends SQLiteOpenHelper
                 }
 
                 // Loop through each point, adding it to the outline table
-                // i starts at 2, as that is where the points start
-                for( int i = 2; i < pointNum; i += 2 )
+                // i starts at 4, as that is where the points start ( and after the center point
+                for( int i = 4; i < pointNum; i += 2 )
                 {
                     // Build the query to add this record information to the outlines table
                     // Note that the OUTLINE_ID is not needed as it is auto incremented
