@@ -52,7 +52,7 @@ public class LatLngTools {
                 distance = newDistance;
             }
         }
-        
+
         return closest;
     }
 
