@@ -121,6 +121,17 @@ public class DbHelper extends SQLiteOpenHelper
 
     }
 
+    // Removes trailing commas in a line and returns the final string
+    private String RemoveTrailingCommas( String line )
+    {
+        while(line.endsWith(","))
+        {
+            line = line.substring(0, line.length() - 2);
+        }
+
+        return line;
+    }
+
     // Imports a CSV file about building information ( Outlines and centre ) and loads it into the database
     // The second paramater is the database that the CSV file will be loaded into
     // Returns true on success
@@ -151,23 +162,33 @@ public class DbHelper extends SQLiteOpenHelper
 
         try
         {
+            // Boolean that indicates whether the '###' denoting string has been hit or not
+            boolean tripleHashHit = false;
+            boolean tripleMoneyHit = false;
+
             // 'Read in' one line to skip it as the first line is just titles for the fields
             buffer.readLine();
 
             // Loop through the CSV file, reading in each line one by one
             String line = "";
-            while( ( line = buffer.readLine() ) != null && !line.startsWith("###"))
+            while( ( line = buffer.readLine() ) != null )
             {
-                // Temporary string to hold each element separated by a comma in the CSV file
+                // This will check for denoting string '###', which indicates that Icon coordinates will be read in
+                if( line.startsWith( "###" ) )
+                {
+                    // Flip associated boolean to indicate that we have passed '###'
+                    tripleHashHit = true;
+
+                    // Break the loop as we are done loading in building coordinates
+                    break;
+                }
 
                 //Remove trailing commas
-                while(line.endsWith(","))
-                {
-                    line = line.substring(0, line.length() - 2);
-                }
+                line = RemoveTrailingCommas( line );
 
                 Log.d( "UCDetailedMaps", line );
 
+                // Temporary string array to hold each seperated element from the line
                 String[] tmpString = line.split( "," );
 
                 // This is the query to send to the building table to create a new building record
@@ -218,6 +239,79 @@ public class DbHelper extends SQLiteOpenHelper
                     // Submit the query to add a new point for that building!
                     //db.execSQL( outlinePointQuery );
                 }
+            }
+
+            // Check to see if a '###' has been found, if not, something is wrong
+            if( !tripleHashHit )
+            {
+                Log.e( "UCDetailedMaps", "### was NOT found after buildings, aborting loading process");
+                return false;
+            }
+
+            Log.d( "UCDetailedMaps", "NOW LOADING ICON TYPES" );
+
+            // Now start reading in Icon Types
+            while( ( line = buffer.readLine() ) != null )
+            {
+                // This will check for denoting string '###', which indicates that Icon coordinates will be read in
+                if( line.startsWith( "$$$" ) )
+                {
+                    // Flip associated boolean to indicate that we have passed '###'
+                    tripleMoneyHit = true;
+
+                    // Break the loop as we are done loading in building coordinates
+                    break;
+                }
+
+                // Remove Trailing Commas
+                line = RemoveTrailingCommas( line );
+
+                Log.d( "UCDetailedMaps", line );
+
+                // Temp string to hold seperated elements
+                String[] tmpString = line.split( "," );
+
+                // Create a contentValue to push to the Icon table in the database
+                ContentValues contentValues = new ContentValues();
+
+                // Read in ID and associated icon label
+                contentValues.put( ICONTYPES_ID, tmpString[0] );
+                contentValues.put( ICONTYPES_NAME, tmpString[1] );
+
+                // PUSH IT
+                db.insert(ICONTYPES_TABLE, null, contentValues);
+            }
+
+            // Check to see if a '$$$' has been found, if not, something is wrong
+            if( !tripleHashHit )
+            {
+                Log.e( "UCDetailedMaps", "$$$ was NOT found after icon types, aborting loading process");
+                return false;
+            }
+
+            Log.d( "UCDetailedMaps", "NOW LOADING ICONS" );
+
+            // Now start reading in the Icons themselves
+            while( ( line = buffer.readLine() ) != null )
+            {
+                // Remove Trailing Commas
+                line = RemoveTrailingCommas( line );
+
+                Log.d( "UCDetailedMaps", line );
+
+                // Temp string to hold seperated elements
+                String[] tmpString = line.split( "," );
+
+                // Create a contentValue to push to the Icon table in the database
+                ContentValues contentValues = new ContentValues();
+
+                // Read in ID and associated icon label
+                contentValues.put( ICONS_TYPE_ID, tmpString[1] );
+                contentValues.put( ICONS_LABEL, tmpString[0] );
+                contentValues.put( ICONS_LAT, tmpString[2] );
+                contentValues.put( ICONS_LNG, tmpString[3] );
+
+                db.insert(ICONS_TABLE, null, contentValues);
             }
         }
         catch( IOException exception )
