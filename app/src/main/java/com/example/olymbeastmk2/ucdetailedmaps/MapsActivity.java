@@ -49,6 +49,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ActionBarDrawerToggle mDrawerToggle;
     private ListView mDrawerList;
 
+    //Local stuff
+    private ArrayList<Building> buildings;
+    //private HashMap<String, ArrayList<Icon>> icons;
+
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
@@ -101,7 +105,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                //refreshDrawerListView();
+                refreshDrawerListView();
             }
 
             @Override
@@ -142,7 +146,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         DbHelper dbBuildHelp = new DbHelper( this, "UCMapsDB", null, 1 );
 
         //Instance a collection of all the buildings and icons in the database.
-        ArrayList<Building> buildings = dbBuildHelp.GetBuildings();
         HashMap<String, ArrayList<Icon>> icons = new HashMap<String, ArrayList<Icon>>(); // = dbBuildHelp.GetIcons();
 
         //Add each building name as a MenuItem.
@@ -243,9 +246,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         dbBuildHelp.ImportCSVBuildings( rID, resources );
 
         // Building Array
-        ArrayList<Building> tmpBuildArr = dbBuildHelp.GetBuildings();
+        buildings = dbBuildHelp.GetBuildings();
 
-        for( Building b : tmpBuildArr )
+        for( Building b : buildings )
         {
             // Get the building's outline coordinates from the database
             ArrayList<LatLng> latLngArr = b.getOutline();
