@@ -3,6 +3,7 @@ package com.example.olymbeastmk2.ucdetailedmaps;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.graphics.BitmapFactory;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -314,6 +316,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Polygon bPoly = mMap.addPolygon( bOptions );
         }
 
+        // Scaling info found here
+        // https://stackoverflow.com/questions/32692814/resizing-a-custom-marker-on-android-maps
+        // https://stackoverflow.com/questions/15255611/how-to-convert-a-drawable-image-from-resources-to-a-bitmap
+
+        // Scaled Water bitmap
+        Bitmap waterBitmapOriginal = BitmapFactory.decodeResource(getResources(), R.mipmap.water);
+        double scaleFactor = 0.25;
+        int newWidth = ( int ) ( scaleFactor * waterBitmapOriginal.getWidth() );
+        int newHeight = ( int ) ( scaleFactor * waterBitmapOriginal.getHeight() );
+        Bitmap waterBitmap = Bitmap.createScaledBitmap( waterBitmapOriginal, newWidth, newHeight, true );
+
+        // Scaled Casual Parking Bitmap
+        Bitmap parkingBitmapOriginal = BitmapFactory.decodeResource( getResources(), R.mipmap.casualparking );
+        newWidth = ( int ) ( scaleFactor * parkingBitmapOriginal.getWidth() );
+        newHeight = ( int ) ( scaleFactor * parkingBitmapOriginal.getHeight() );
+        Bitmap parkingBitmap = Bitmap.createScaledBitmap( parkingBitmapOriginal, newWidth, newHeight, true );
+
+        // Scaled Telephone Bitmap
+        Bitmap telephoneBitmapOriginal = BitmapFactory.decodeResource( getResources(), R.mipmap.telephone );
+        newWidth = ( int ) ( scaleFactor * telephoneBitmapOriginal.getWidth() );
+        newHeight = ( int ) ( scaleFactor * telephoneBitmapOriginal.getHeight() );
+        Bitmap telephoneBitmap = Bitmap.createScaledBitmap( telephoneBitmapOriginal, newWidth, newHeight, true );
 
 
         icons = dbBuildHelp.GetIcons();
@@ -325,6 +349,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //The icon to display for this location.
                 int icon_icon = R.mipmap.ic_launcher; //R.mpmap.ic_launcher is temporary until icons are added.
 
+                Bitmap selectedBitmap = null;
+
                 // Boolean to say whether to add the marker or not
                 boolean bAddMarker = true;
 
@@ -333,12 +359,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 {
                     case "Water" :
                         icon_icon = R.mipmap.water;
+                        selectedBitmap = waterBitmap;
                         break;
                     case "Casual Parking" :
                         icon_icon = R.mipmap.casualparking;
+                        selectedBitmap = parkingBitmap;
                         break;
                     case "Telephone" :
                         icon_icon = R.mipmap.telephone;
+                        selectedBitmap = telephoneBitmap;
                         break;
                     default :
                         bAddMarker = false;
@@ -347,9 +376,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 if( bAddMarker )
                 {
+
+
                     final Marker iconMarker = mMap.addMarker(new MarkerOptions()
                             .position(i.getLocation())
-                            .icon(BitmapDescriptorFactory.fromResource(icon_icon))
+                            .icon( BitmapDescriptorFactory.fromBitmap( selectedBitmap ) )
                     );
                 }
             }
