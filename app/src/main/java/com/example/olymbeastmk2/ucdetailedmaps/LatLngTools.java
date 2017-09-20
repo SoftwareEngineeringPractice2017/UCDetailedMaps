@@ -12,7 +12,7 @@ public class LatLngTools {
 
 
     //Average the points together.
-    public  static LatLng GetCenter(ArrayList<LatLng> polygon)
+    public  static LatLng getCenter(ArrayList<LatLng> polygon)
     {
         double latitude = 0;
         double longitude = 0;
@@ -30,12 +30,30 @@ public class LatLngTools {
     }
 
     //Pythagorean triangle.
-    public static double GetDistance(LatLng pointA, LatLng pointB)
+    public static double getDistance(LatLng pointA, LatLng pointB)
     {
         double a2 = pointA.latitude * pointA.latitude;
         double b2 = pointB.longitude * pointB.longitude;
 
         return Math.abs(Math.sqrt(a2 + b2));
+    }
+
+    public static Icon findClosestIcon(LatLng location, ArrayList<Icon> icons)
+    {
+        Icon closest = icons.get(0);
+        double distance = getDistance(location, closest.getLocation());
+
+        for(Icon i : icons)
+        {
+            double newDistance = getDistance(location, i.getLocation());
+            if(newDistance < distance)
+            {
+                closest = i;
+                distance = newDistance;
+            }
+        }
+        
+        return closest;
     }
 
 
