@@ -151,17 +151,31 @@ public class DbHelper extends SQLiteOpenHelper
 
             // Loop through the CSV file, reading in each line one by one
             String line = "";
-            while( ( line = buffer.readLine() ) != null )
+            while( ( line = buffer.readLine() ) != null && !line.startsWith("###"))
             {
                 // Temporary string to hold each element separated by a comma in the CSV file
+
+                //Remove trailing commas:
+                while(line.endsWith(",,"))
+                {
+                    line = line.substring(0, line.length() - 3);
+                }
+
                 String[] tmpString = line.split( "," );
 
                 // This is the query to send to the building table to create a new building record
                 // The building number will be the building's ID
                 // tmpString[1] is where the building's ID is ( Second field )
                 // Currently there is no name implemented in the CSV file
-                String buildingQuery = "INSERT INTO " + BUILDING_TABLE + " VALUES( " + tmpString[1] + ", 'NO NAME'" + ");";
+
+                /* OLD CODE
+                String buildingQuery = "INSERT INTO " + BUILDING_TABLE + " VALUES( \"" + tmpString[0] + "\", 'NO NAME'" + ");";
                 db.execSQL( buildingQuery );
+                */
+
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(BUILDING_NAME, tmpString[0]);
+                int rowID = (int) db.insert(BUILDING_TABLE, null, contentValues);
 
                 // Get number of elements in the tmpString array to know how many points will be added to the outlines table
                 int pointNum = tmpString.length;
@@ -181,12 +195,21 @@ public class DbHelper extends SQLiteOpenHelper
                     // Build the query to add this record information to the outlines table
                     // Note that the OUTLINE_ID is not needed as it is auto incremented
                     // tmpString[ i ] is the latitude, tmpString[ i + 1 ] is the longitude
+
+                    /* OLD CODE
                     String outlinePointQuery = "INSERT INTO " + OUTLINE_TABLE + "( " +
                             OUTLINE_BUILDING_ID + ", " + OUTLINE_LAT + ", " + OUTLINE_LNG + ") " +
                             "VALUES( " + tmpString[1] + ", " + tmpString[ i ] + ", " + tmpString[ i + 1 ] + ");";
+                    */
+
+                    ContentValues contentValues1 = new ContentValues();
+                    contentValues1.put(OUTLINE_BUILDING_ID, Integer.toString(rowID));
+                    contentValues1.put(OUTLINE_LAT, tmpString[i]);
+                    contentValues1.put(OUTLINE_LNG, tmpString[i + 1]);
+                    db.insert(OUTLINE_TABLE, null, contentValues1);
 
                     // Submit the query to add a new point for that building!
-                    db.execSQL( outlinePointQuery );
+                    //db.execSQL( outlinePointQuery );
                 }
             }
         }
@@ -218,6 +241,7 @@ public class DbHelper extends SQLiteOpenHelper
         return output;
     }
 
+    //TODO: Return Dictionary<IconType, Icon> instead.
     public ArrayList<Icon> GetIcons()
     {
         ArrayList<Icon> output = new ArrayList<Icon>();

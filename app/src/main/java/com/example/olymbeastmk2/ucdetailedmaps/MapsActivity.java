@@ -7,10 +7,12 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,17 +31,19 @@ import java.util.ArrayList;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 {
 
+    //Map Stuff
     private GoogleMap mMap;
 
+    //Database Stuff
     // A Handle to the applications resources
     public Resources resources;
-
     // The package name for easy use
     public static String PACKAGE_NAME;
 
     // Drawer stuff
     private String[] titles;
     private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
     private ListView mDrawerList;
 
     @Override
@@ -55,11 +59,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = ( SupportMapFragment ) getSupportFragmentManager()
                 .findFragmentById( R.id.map );
 
-        //Drawer stuff
+        InitializeDrawer();
+
+        mapFragment.getMapAsync( this );
+
+    }
+
+    private void InitializeDrawer()
+    {
         titles = new String[] {"One", "Two", "Three"};
+
+        //Drawer Layout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
-
 
         ArrayList<String> asd = new ArrayList<String>();
         for(String s : titles)
@@ -73,12 +85,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mDrawerLayout.openDrawer(Gravity.LEFT);
+                mDrawerLayout.openDrawer(Gravity.START);
             }
         });
 
-        mapFragment.getMapAsync( this );
 
+        mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                EditText SearchBox = (EditText) findViewById(R.id.editText);
+                String search = SearchBox.getText().toString();
+
+
+
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
+
+    }
+
+    private ArrayList<MenuItem> GetMenuItems()
+    {
+        ArrayList<MenuItem> output = new ArrayList<MenuItem>();
+
+        return output;
     }
 
 
@@ -122,7 +166,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         resources = getResources();
 
         // Create a uri ( Full resource path name ) to get an ID from
-        String uri = MapsActivity.PACKAGE_NAME + ":raw/gpscoord";
+        String uri = MapsActivity.PACKAGE_NAME + ":raw/gpscoord2";
 
         Log.d( "UCDetailedMap", "URI is: " + uri );
 
