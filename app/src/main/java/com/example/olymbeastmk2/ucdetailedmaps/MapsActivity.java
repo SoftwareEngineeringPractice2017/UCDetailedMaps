@@ -8,6 +8,8 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -119,6 +121,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        EditText SearchBox = (EditText) findViewById(R.id.editText);
+        SearchBox.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                refreshDrawerListView();
+            }
+        });
+
+
     }
 
     public void refreshDrawerListView()
@@ -169,13 +190,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private ArrayList<MenuItem> FilterMenuItems(ArrayList<MenuItem> input, String filter)
     {
+        filter = filter.toLowerCase();
         //ArrayList to be loaded with MenuItems that start with filter.
         ArrayList<MenuItem> output = new ArrayList<MenuItem>();
 
         //Cycle through each MenuItem in input.
         for(MenuItem m : input)
         {
-            if(m.text.startsWith(filter))
+            if(m.text.toLowerCase().startsWith(filter))
             {
                 output.add(m);
             }
