@@ -32,6 +32,13 @@ public class Icon
         hasLocation = false;
     }
 
+    public void Load()
+    {
+        getType();
+        getLabel();
+        getLocation();
+    }
+
     public int getID()
     {
         return id;

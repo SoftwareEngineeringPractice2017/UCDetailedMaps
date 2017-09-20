@@ -38,6 +38,13 @@ public class Building
         hasEntries = false;
     }
 
+    public void Load()
+    {
+        getName();
+        getOutline();
+        getEntries();
+    }
+
     public int getID()
     {
         //will be saved locally.
