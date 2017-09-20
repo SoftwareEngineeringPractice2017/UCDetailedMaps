@@ -40,6 +40,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //Map Stuff
     private GoogleMap mMap;
 
+    //Location Stuff
+
     //Database Stuff
     // A Handle to the applications resources
     public Resources resources;
