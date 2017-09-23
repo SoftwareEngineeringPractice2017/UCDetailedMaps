@@ -116,14 +116,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 });
     }
 
+    // The marker that will be used to show the user's location
+    private Marker userLocMarker = null;
+
     public void onLocationChanged( Location location )
     {
         // The new location has now been determined
         String msg = "Updated Location: " + Double.toString( location.getLatitude() ) + Double.toString( location.getLongitude() );
-        Toast.makeText( this, msg, Toast.LENGTH_SHORT ).show();
+        // Toast.makeText( this, msg, Toast.LENGTH_SHORT ).show();
 
         // A LatLnt Object for use with maps is now created!
-        LatLng latLng = new LatLng( location.getLatitude(), location.getLongitude() );
+        LatLng userLocation = new LatLng( location.getLatitude(), location.getLongitude() );
+
+        // Create a marker on the users position ( if there is not already one there )
+        if( userLocMarker == null )
+        {
+            // Create a new marker
+            userLocMarker = mMap.addMarker( new MarkerOptions().position( userLocation ).icon( BitmapDescriptorFactory.fromResource( R.mipmap.panda ) ) );
+
+            Log.d( "UCDetailedMaps", "CREATED A PANDA :D" + Double.toString( userLocation.latitude ) + Double.toString( userLocation.longitude ) );
+        }
+        // If the marker is already created, move it!
+        else
+        {
+            userLocMarker.setPosition( userLocation );
+
+            Log.d( "UCDetailedMaps", "UPDATED THE PANDA! AT" + Double.toString( userLocation.latitude ) + Double.toString( userLocation.longitude ) );
+        }
     }
 
     protected void startLocationUpdates()
@@ -184,6 +203,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Setup the drawer.
         InitializeDrawer();
+
+        // Start updating the user's location
+        startLocationUpdates();
 
         mapFragment.getMapAsync( this );
     }
@@ -398,6 +420,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         mMap = googleMap;
 
+        // Check permissions for locations!
+        if( checkPermissions() )
+        {
+            googleMap.setMyLocationEnabled( true );
+        }
+
         // Set Maximum and Minimum Zoom
         mMap.setMaxZoomPreference( 27 );
         mMap.setMinZoomPreference( 12 );
@@ -516,8 +544,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 if( bAddMarker )
                 {
-
-
                     final Marker iconMarker = mMap.addMarker(new MarkerOptions()
                             .position(i.getLocation())
                             .icon( BitmapDescriptorFactory.fromBitmap( selectedBitmap ) )
