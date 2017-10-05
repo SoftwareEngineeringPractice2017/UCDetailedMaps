@@ -6,8 +6,11 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PatternItem;
 
@@ -20,6 +23,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Olymbeastmk2 on 09-Sep-17.
@@ -340,6 +344,31 @@ public class DbHelper extends SQLiteOpenHelper
         }
 
         return output;
+    }
+
+
+    public HashMap<String, Bitmap> IconTypeTable = new HashMap<String, Bitmap>();
+
+    // Scale factor for use in resizing bitmaps
+    final double SCALE_FACTOR = 0.5;
+
+    // This function will make a reduced sized bitmap for each type of icon
+    private void AddIconTypeBitmap( String iconType, Resources resources )
+    {
+        // Get the identifier of the bitmap
+        int tmpID = resources.getIdentifier( iconType, "drawable", MapsActivity.this.getPackagename() );
+
+        // From resources, load the bitmap
+        Bitmap tmpBitmap = BitmapFactory.decodeResource( resources, tmpID );
+
+        Bitmap telephoneBitmapOriginal = BitmapFactory.decodeResource( getResources(), R.mipmap.telephone );
+        newWidth = ( int ) ( scaleFactor * telephoneBitmapOriginal.getWidth() );
+        newHeight = ( int ) ( scaleFactor * telephoneBitmapOriginal.getHeight() );
+        Bitmap telephoneBitmap = Bitmap.createScaledBitmap( telephoneBitmapOriginal, newWidth, newHeight, true );
+
+        // Resize the bitmap
+        int newWidth = ( int ) ( SCALE_FACTOR * tmpBitmap.getWidth() );
+        int newHeight = ( int ) ( SCALE_FACTOR)
     }
 
     public HashMap<String, ArrayList<Icon>> GetIcons()

@@ -9,8 +9,6 @@ import java.util.ArrayList;
  */
 
 public class LatLngTools {
-
-
     //Average the points together.
     public  static LatLng getCenter(ArrayList<LatLng> polygon)
     {
@@ -55,12 +53,4 @@ public class LatLngTools {
 
         return closest;
     }
-
-
-
-
-
-
-
-
 }

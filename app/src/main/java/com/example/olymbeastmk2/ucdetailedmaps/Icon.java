@@ -1,9 +1,16 @@
 package com.example.olymbeastmk2.ucdetailedmaps;
 
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Created by Olymbeastmk2 on 09-Sep-17.
@@ -97,4 +104,20 @@ public class Icon
         return location;
     }
 
+    // This will make sure that an icon has not been added once
+    boolean hasBeenAddedToMap = false;
+
+    // The scale factor for the icon size
+    double scaleFactor = 0.5;
+
+    // This adds an icon as a marker to the map and stores the marker information ( For Future reference )
+    public void AddAsMarker( GoogleMap mMap, Resources resources )
+    {
+        Bitmap iconBitmap = parent.IconTypeTable.get(getType());
+
+        MarkerOptions mkrOptPass = new MarkerOptions().position( getLocation() );
+        mkrOptPass.icon( BitmapDescriptorFactory.)
+
+        Marker tmpMarker = mMap.addMarker( mkrOptPass );
+    }
 }
