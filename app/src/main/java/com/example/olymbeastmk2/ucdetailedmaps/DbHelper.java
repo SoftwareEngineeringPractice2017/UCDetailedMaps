@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -260,7 +261,7 @@ public class DbHelper extends SQLiteOpenHelper
                 // This will check for denoting string '###', which indicates that Icon coordinates will be read in
                 if( line.startsWith( "$$$" ) )
                 {
-                    // Flip associated boolean to indicate that we have passed '###'
+                    // Flip associated boolean to indicate that we have passed '$$$'
                     tripleMoneyHit = true;
 
                     // Break the loop as we are done loading in building coordinates
@@ -287,7 +288,7 @@ public class DbHelper extends SQLiteOpenHelper
             }
 
             // Check to see if a '$$$' has been found, if not, something is wrong
-            if( !tripleHashHit )
+            if( !tripleMoneyHit )
             {
                 Log.e( "UCDetailedMaps", "$$$ was NOT found after icon types, aborting loading process");
                 return false;
@@ -346,6 +347,7 @@ public class DbHelper extends SQLiteOpenHelper
         return output;
     }
 
+    boolean iconTypesGenerated = false;
 
     public HashMap<String, Bitmap> IconTypeTable = new HashMap<String, Bitmap>();
 
@@ -361,14 +363,42 @@ public class DbHelper extends SQLiteOpenHelper
         // From resources, load the bitmap
         Bitmap tmpBitmap = BitmapFactory.decodeResource( resources, tmpID );
 
-        Bitmap telephoneBitmapOriginal = BitmapFactory.decodeResource( getResources(), R.mipmap.telephone );
-        newWidth = ( int ) ( scaleFactor * telephoneBitmapOriginal.getWidth() );
-        newHeight = ( int ) ( scaleFactor * telephoneBitmapOriginal.getHeight() );
-        Bitmap telephoneBitmap = Bitmap.createScaledBitmap( telephoneBitmapOriginal, newWidth, newHeight, true );
-
-        // Resize the bitmap
+        // Resize the bitmap and place it in the HashMap array with the associated Type
         int newWidth = ( int ) ( SCALE_FACTOR * tmpBitmap.getWidth() );
-        int newHeight = ( int ) ( SCALE_FACTOR)
+        int newHeight = ( int ) ( SCALE_FACTOR * tmpBitmap.getHeight() );
+        IconTypeTable.put( iconType, Bitmap.createScaledBitmap( tmpBitmap, newWidth, newHeight, true ) );
+    }
+
+    // This function will generate icon images for all icon types in the database
+    public void GenerateAllTypeImages( Resources resources )
+    {
+        // Get the HashMap indicating all icon types
+        HashMap<Integer, String> allTypes = GetIconTypes();
+
+        // Generate all images from the type list
+        Iterator it = allTypes.entrySet().iterator();
+        while( it.hasNext() )
+        {
+            
+        }
+    }
+
+    // Returns all the types as strings
+    public HashMap<Integer, String> GetIconTypes()
+    {
+        HashMap<Integer, String> output = new HashMap<Integer, String>();
+
+        Cursor res = getReadableDatabase().rawQuery("select * from " + ICONTYPES_TABLE, null);
+        res.moveToFirst();
+
+        while(res.isAfterLast() == false)
+        {
+            output.put( res.getInt( res.getColumnIndex( ICONTYPES_ID ) ), res.getString( res.getColumnIndex( ICONTYPES_NAME ) ) );
+
+            res.moveToNext();
+        }
+
+        return output;
     }
 
     public HashMap<String, ArrayList<Icon>> GetIcons()
