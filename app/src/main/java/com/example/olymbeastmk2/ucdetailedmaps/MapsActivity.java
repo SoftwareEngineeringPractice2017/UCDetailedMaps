@@ -80,8 +80,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Drawer stuff
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
-    private ArrayList< MenuItem > menuItems;
-    private ArrayList< MenuItem > currentMenu;
+    private MenuHandler menuHandler;
+
+
+//    private ArrayList< MenuItem > menuItems;
+//    private ArrayList< MenuItem > currentMenu;
 
     //Local stuff
     private ArrayList< Building > buildings;
@@ -203,6 +206,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Setup the drawer.
         InitializeDrawer();
+        menuHandler = new MenuHandler();
 
         // Start updating the user's location
         startLocationUpdates();
@@ -297,68 +301,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String search = SearchBox.getText().toString();
 
         //This should be moved at a later point. Should only be called once.
-        menuItems = GetMenuItems();
+        menuHandler.populate(buildings, icons);
 
-        currentMenu = FilterMenuItems( menuItems, search );
+        menuHandler.filter( search );
 
         MenuAdapter menuAdapter = new MenuAdapter( this,
                 R.layout.drawer_list_item,
-                MenuItemsNames( currentMenu ),
-                currentMenu );
+                menuHandler.menuItemsNames(),
+                menuHandler.getCurrentMenu() );
 
         mDrawerList.setAdapter( menuAdapter );
-    }
-
-    private ArrayList< MenuItem > GetMenuItems()
-    {
-        //ArrayList to be loaded and returned.
-        ArrayList< MenuItem > output = new ArrayList< MenuItem >();
-
-        //Add each building name as a MenuItem.
-        for( Building b : buildings )
-        {
-            output.add( new MenuItem( b.getID(), b.getName() ) );
-        }
-
-        //Each key in icons represents an IconType.
-        //Cycle through each IconType and add each as a new MenuItem.
-        for( String s : icons.keySet() )
-        {
-            output.add( new MenuItem( s ) );
-        }
-
-        //Sort output alphabetically.
-        Collections.sort( output );
-
-        return output;
-    }
-
-    private ArrayList< MenuItem > FilterMenuItems( ArrayList< MenuItem > input, String filter )
-    {
-        filter = filter.toLowerCase();
-        //ArrayList to be loaded with MenuItems that start with filter.
-        ArrayList< MenuItem > output = new ArrayList< MenuItem >();
-
-        //Cycle through each MenuItem in input.
-        for( MenuItem m : input )
-        {
-            if( m.text.toLowerCase().contains( filter ) )
-            {
-                output.add( m );
-            }
-        }
-
-        return output;
-    }
-
-    private ArrayList< String > MenuItemsNames( ArrayList< MenuItem > input )
-    {
-        ArrayList< String > objects = new ArrayList< String >();
-        for( MenuItem m : input )
-        {
-            objects.add( m.text );
-        }
-        return objects;
     }
 
     private void MenuItemClicked( int position )
@@ -367,7 +319,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng location = new LatLng( 0, 0 );
         ;
 
-        MenuItem menuItem = currentMenu.get( position );
+        MenuItem menuItem = menuHandler.get( menuHandler.currentIndexToActualIndex(position) );
 
         if( menuItem.type == MenuItem.ItemType.Building )
         {

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -34,7 +35,13 @@ public class MenuAdapter extends ArrayAdapter<String>{
         }
 
         CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
-        checkBox.setChecked(true);
+        checkBox.setChecked(elements.get(position).checked);
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+
+            }
+        });
 
         TextView label = (TextView) convertView.findViewById(R.id.textView);
         label.setText(elements.get(position).text);
