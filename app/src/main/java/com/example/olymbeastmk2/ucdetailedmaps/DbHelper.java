@@ -370,7 +370,6 @@ public class DbHelper extends SQLiteOpenHelper
     }
 
     // This function will generate icon images for all icon types in the database
-    //
     public void GenerateAllTypeImages( Resources resources )
     {
         // Get the HashMap indicating all icon types
