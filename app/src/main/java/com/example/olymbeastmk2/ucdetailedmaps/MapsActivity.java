@@ -85,7 +85,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //Local stuff
     private ArrayList< Building > buildings;
-    private HashMap< String, ArrayList< Icon > > icons;
+    private HashMap< String, Array List< Icon > > icons;
 
     public void getLastLocation()
     {
@@ -442,6 +442,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Initialize Database helper for all database needs
         DbHelper dbBuildHelp = new DbHelper( this, "UCMapsDB", null, 1 );
 
+        // Generate all Bitmaps for icons
+        dbBuildHelp.GenerateAllTypeImages( getResources() );
+
         //Temporary code for development. The database is constant even after updates in code.
         //Therefore it is necessary to rebuild it each time the app is debugged, in case of changes.
         dbBuildHelp.ClearEverything();
@@ -484,71 +487,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Polygon bPoly = mMap.addPolygon( bOptions );
         }
 
-        // Scaling info found here
-        // https://stackoverflow.com/questions/32692814/resizing-a-custom-marker-on-android-maps
-        // https://stackoverflow.com/questions/15255611/how-to-convert-a-drawable-image-from-resources-to-a-bitmap
-
-        // Scaled Water bitmap
-        Bitmap waterBitmapOriginal = BitmapFactory.decodeResource(getResources(), R.mipmap.water);
-        double scaleFactor = 0.5;
-        int newWidth = ( int ) ( scaleFactor * waterBitmapOriginal.getWidth() );
-        int newHeight = ( int ) ( scaleFactor * waterBitmapOriginal.getHeight() );
-        Bitmap waterBitmap = Bitmap.createScaledBitmap( waterBitmapOriginal, newWidth, newHeight, true );
-
-        // Scaled Casual Parking Bitmap
-        Bitmap parkingBitmapOriginal = BitmapFactory.decodeResource( getResources(), R.mipmap.casualparking );
-        newWidth = ( int ) ( scaleFactor * parkingBitmapOriginal.getWidth() );
-        newHeight = ( int ) ( scaleFactor * parkingBitmapOriginal.getHeight() );
-        Bitmap parkingBitmap = Bitmap.createScaledBitmap( parkingBitmapOriginal, newWidth, newHeight, true );
-
-        // Scaled Telephone Bitmap
-        Bitmap telephoneBitmapOriginal = BitmapFactory.decodeResource( getResources(), R.mipmap.telephone );
-        newWidth = ( int ) ( scaleFactor * telephoneBitmapOriginal.getWidth() );
-        newHeight = ( int ) ( scaleFactor * telephoneBitmapOriginal.getHeight() );
-        Bitmap telephoneBitmap = Bitmap.createScaledBitmap( telephoneBitmapOriginal, newWidth, newHeight, true );
-
-
         icons = dbBuildHelp.GetIcons();
 
         for(String s : icons.keySet())
         {
             for(Icon i : icons.get(s))
             {
-                //The icon to display for this location.
-                int icon_icon = R.mipmap.ic_launcher; //R.mpmap.ic_launcher is temporary until icons are added.
-
-                Bitmap selectedBitmap = null;
-
-                // Boolean to say whether to add the marker or not
-                boolean bAddMarker = true;
-
-                //Set icon_icon to the right icon.
-                switch(i.getType())
-                {
-                    case "Water" :
-                        icon_icon = R.mipmap.water;
-                        selectedBitmap = waterBitmap;
-                        break;
-                    case "Casual Parking" :
-                        icon_icon = R.mipmap.casualparking;
-                        selectedBitmap = parkingBitmap;
-                        break;
-                    case "Telephone" :
-                        icon_icon = R.mipmap.telephone;
-                        selectedBitmap = telephoneBitmap;
-                        break;
-                    default :
-                        bAddMarker = false;
-                        break;
-                }
-
-                if( bAddMarker )
-                {
-                    final Marker iconMarker = mMap.addMarker(new MarkerOptions()
-                            .position(i.getLocation())
-                            .icon( BitmapDescriptorFactory.fromBitmap( selectedBitmap ) )
-                    );
-                }
+                i.AddAsMarker( mMap, getResources() );
             }
         }
 

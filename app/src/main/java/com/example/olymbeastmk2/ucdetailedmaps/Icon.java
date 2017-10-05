@@ -29,6 +29,8 @@ public class Icon
     private LatLng location;
     private boolean hasLocation;
 
+    private Marker marker = null;
+
     public Icon(int _id, DbHelper _parent)
     {
         id = _id;
@@ -107,17 +109,16 @@ public class Icon
     // This will make sure that an icon has not been added once
     boolean hasBeenAddedToMap = false;
 
-    // The scale factor for the icon size
-    double scaleFactor = 0.5;
-
     // This adds an icon as a marker to the map and stores the marker information ( For Future reference )
     public void AddAsMarker( GoogleMap mMap, Resources resources )
     {
         Bitmap iconBitmap = parent.IconTypeTable.get(getType());
 
         MarkerOptions mkrOptPass = new MarkerOptions().position( getLocation() );
-        mkrOptPass.icon( BitmapDescriptorFactory.)
+        mkrOptPass.icon( BitmapDescriptorFactory.fromBitmap( parent.GetIconTypeBitmap( getType() ) ) );
 
-        Marker tmpMarker = mMap.addMarker( mkrOptPass );
+        marker = mMap.addMarker( mkrOptPass );
+
+        hasBeenAddedToMap = true;
     }
 }

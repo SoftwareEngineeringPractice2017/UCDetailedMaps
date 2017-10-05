@@ -351,6 +351,10 @@ public class DbHelper extends SQLiteOpenHelper
 
     public HashMap<String, Bitmap> IconTypeTable = new HashMap<String, Bitmap>();
 
+    // Scaling info found here
+    // https://stackoverflow.com/questions/32692814/resizing-a-custom-marker-on-android-maps
+    // https://stackoverflow.com/questions/15255611/how-to-convert-a-drawable-image-from-resources-to-a-bitmap
+
     // Scale factor for use in resizing bitmaps
     final double SCALE_FACTOR = 0.5;
 
@@ -375,12 +379,20 @@ public class DbHelper extends SQLiteOpenHelper
         // Get the HashMap indicating all icon types
         HashMap<Integer, String> allTypes = GetIconTypes();
 
-        // Generate all images from the type list
-        Iterator it = allTypes.entrySet().iterator();
-        while( it.hasNext() )
+        for( HashMap.Entry<Integer, String> entry : allTypes.entrySet() )
         {
+            // Get the icon type name
+            String iconTypeName = entry.getValue();
 
+            // Generate and add the Bitmap to the HashMap for Icon type bitmaps
+            AddIconTypeBitmap( iconTypeName, resources );
         }
+    }
+
+    // Gets a bitmap from the hashmap by using a string ( type name )
+    public Bitmap GetIconTypeBitmap( String name )
+    {
+        return IconTypeTable.get( name );
     }
 
     // Returns all the types as strings
