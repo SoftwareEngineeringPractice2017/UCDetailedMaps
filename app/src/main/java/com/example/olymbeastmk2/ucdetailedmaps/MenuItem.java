@@ -8,22 +8,26 @@ public class MenuItem implements Comparable<MenuItem> {
 
     public enum ItemType {Icon, Building}
 
+    int location;
+    boolean checked;
     int id;
     ItemType type;
     String text;
 
-    public MenuItem(int _id,  String _text)
+    public MenuItem( int _id,  String _text)
     {
         id = _id;
         type = ItemType.Building;
         text = _text;
+        checked = true;
     }
 
-    public MenuItem(String _text)
+    public MenuItem( String _text)
     {
         id = -1;
         type = ItemType.Icon;
         text = _text;
+        checked = true;
     }
 
     @Override
