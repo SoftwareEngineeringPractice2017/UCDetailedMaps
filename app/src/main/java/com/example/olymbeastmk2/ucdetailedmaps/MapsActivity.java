@@ -85,7 +85,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //Local stuff
     private ArrayList< Building > buildings;
-    private HashMap< String, Array List< Icon > > icons;
+    private HashMap< String, ArrayList< Icon > > icons;
 
     public void getLastLocation()
     {
@@ -188,7 +188,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate( savedInstanceState );
 
         // Package name init
-        PACKAGE_NAME = getApplicationContext().getPackageName();
+        PACKAGE_NAME = this.getPackageName();
 
         setContentView( R.layout.activity_maps );
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -442,9 +442,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Initialize Database helper for all database needs
         DbHelper dbBuildHelp = new DbHelper( this, "UCMapsDB", null, 1 );
 
-        // Generate all Bitmaps for icons
-        dbBuildHelp.GenerateAllTypeImages( getResources() );
-
         //Temporary code for development. The database is constant even after updates in code.
         //Therefore it is necessary to rebuild it each time the app is debugged, in case of changes.
         dbBuildHelp.ClearEverything();
@@ -464,6 +461,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Load the information from the CSV file into the database
         // As GPSCoord is a raw resource, the extension is not included
         dbBuildHelp.ImportCSVBuildings( rID, resources );
+
+        // Generate all Bitmaps for icons
+        dbBuildHelp.GenerateAllTypeImages( getResources() );
 
         // Building Array
         buildings = dbBuildHelp.GetBuildings();
@@ -496,9 +496,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 i.AddAsMarker( mMap, getResources() );
             }
         }
-
-
-
     }
 
 }

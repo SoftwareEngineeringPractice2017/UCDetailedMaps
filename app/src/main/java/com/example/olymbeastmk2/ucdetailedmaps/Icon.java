@@ -112,7 +112,7 @@ public class Icon
     // This adds an icon as a marker to the map and stores the marker information ( For Future reference )
     public void AddAsMarker( GoogleMap mMap, Resources resources )
     {
-        Bitmap iconBitmap = parent.IconTypeTable.get(getType());
+        Bitmap iconBitmap = parent.GetIconTypeBitmap( getType() );
 
         MarkerOptions mkrOptPass = new MarkerOptions().position( getLocation() );
         mkrOptPass.icon( BitmapDescriptorFactory.fromBitmap( parent.GetIconTypeBitmap( getType() ) ) );

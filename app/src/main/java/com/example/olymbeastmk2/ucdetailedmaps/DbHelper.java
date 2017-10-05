@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
@@ -258,7 +259,7 @@ public class DbHelper extends SQLiteOpenHelper
             // Now start reading in Icon Types
             while( ( line = buffer.readLine() ) != null )
             {
-                // This will check for denoting string '###', which indicates that Icon coordinates will be read in
+                // This will check for denoting string '$$$', which indicates that Icon coordinates will be read in
                 if( line.startsWith( "$$$" ) )
                 {
                     // Flip associated boolean to indicate that we have passed '$$$'
@@ -284,7 +285,7 @@ public class DbHelper extends SQLiteOpenHelper
                 contentValues.put( ICONTYPES_NAME, tmpString[1] );
 
                 // PUSH IT
-                db.insert(ICONTYPES_TABLE, null, contentValues);
+                db.insert( ICONTYPES_TABLE, null, contentValues );
             }
 
             // Check to see if a '$$$' has been found, if not, something is wrong
@@ -349,7 +350,7 @@ public class DbHelper extends SQLiteOpenHelper
 
     boolean iconTypesGenerated = false;
 
-    public HashMap<String, Bitmap> IconTypeTable = new HashMap<String, Bitmap>();
+    public HashMap<String, Bitmap> IconTypeBitmapHM = new HashMap<String, Bitmap>();
 
     // Scaling info found here
     // https://stackoverflow.com/questions/32692814/resizing-a-custom-marker-on-android-maps
@@ -358,11 +359,26 @@ public class DbHelper extends SQLiteOpenHelper
     // Scale factor for use in resizing bitmaps
     final double SCALE_FACTOR = 0.5;
 
+    // This gets the proper resource name string from the full name pulled from the database
+    private String ConvertToResourceString( String fullName )
+    {
+        // Replace all information: https://stackoverflow.com/questions/5455794/removing-whitespace-from-strings-in-java
+        return fullName.toLowerCase().replaceAll( "\\s+","" );
+    }
+
     // This function will make a reduced sized bitmap for each type of icon
     private void AddIconTypeBitmap( String iconType, Resources resources )
     {
+        String resourceString = ConvertToResourceString( iconType );
+
         // Get the identifier of the bitmap
-        int tmpID = resources.getIdentifier( iconType, "drawable", MapsActivity.this.getPackagename() );
+        int tmpID = resources.getIdentifier( resourceString, "mipmap", MapsActivity.PACKAGE_NAME );
+
+        // If the resource is not available, Substitute in launcher icon
+        if( tmpID == 0 )
+        {
+            tmpID = resources.getIdentifier( "ic_launcher", "mipmap", MapsActivity.PACKAGE_NAME );
+        }
 
         // From resources, load the bitmap
         Bitmap tmpBitmap = BitmapFactory.decodeResource( resources, tmpID );
@@ -370,7 +386,7 @@ public class DbHelper extends SQLiteOpenHelper
         // Resize the bitmap and place it in the HashMap array with the associated Type
         int newWidth = ( int ) ( SCALE_FACTOR * tmpBitmap.getWidth() );
         int newHeight = ( int ) ( SCALE_FACTOR * tmpBitmap.getHeight() );
-        IconTypeTable.put( iconType, Bitmap.createScaledBitmap( tmpBitmap, newWidth, newHeight, true ) );
+        IconTypeBitmapHM.put( resourceString, Bitmap.createScaledBitmap( tmpBitmap, newWidth, newHeight, true ) );
     }
 
     // This function will generate icon images for all icon types in the database
@@ -392,7 +408,13 @@ public class DbHelper extends SQLiteOpenHelper
     // Gets a bitmap from the hashmap by using a string ( type name )
     public Bitmap GetIconTypeBitmap( String name )
     {
-        return IconTypeTable.get( name );
+        String convertedString = ConvertToResourceString( name );
+
+        Bitmap bitmapToReturn = IconTypeBitmapHM.get( convertedString );
+
+        Log.d( "UCDetailedMaps", "HERES THE BITMAP: " + bitmapToReturn.toString() );
+
+        return bitmapToReturn;
     }
 
     // Returns all the types as strings
@@ -405,7 +427,7 @@ public class DbHelper extends SQLiteOpenHelper
 
         while(res.isAfterLast() == false)
         {
-            output.put( res.getInt( res.getColumnIndex( ICONTYPES_ID ) ), res.getString( res.getColumnIndex( ICONTYPES_NAME ) ) );
+            output.put( res.getInt( res.getColumnIndex( ICONTYPES_ID ) ), ConvertToResourceString( res.getString( res.getColumnIndex( ICONTYPES_NAME ) ) ) );
 
             res.moveToNext();
         }
