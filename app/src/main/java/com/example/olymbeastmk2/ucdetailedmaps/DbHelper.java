@@ -363,7 +363,8 @@ public class DbHelper extends SQLiteOpenHelper
     private String ConvertToResourceString( String fullName )
     {
         // Replace all information: https://stackoverflow.com/questions/5455794/removing-whitespace-from-strings-in-java
-        return fullName.toLowerCase().replaceAll( "\\s+","" );
+        // More info: https://stackoverflow.com/questions/23332146/remove-punctuation-preserve-letters-and-white-space-java-regex
+        return fullName.toLowerCase().replaceAll( "\\W","" );
     }
 
     // This function will make a reduced sized bitmap for each type of icon
