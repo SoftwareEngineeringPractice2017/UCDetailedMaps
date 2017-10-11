@@ -83,7 +83,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private MenuHandler menuHandler;
 
     // Array that holds all LatLngs to be sent by email
-    ArrayList<LatLng> emailLatLngArray = new ArrayList<LatLng>();
+    ArrayList<LatLng> debugLatLngArray = new ArrayList<LatLng>();
 
     // The temporary placeholder for the current LatLng on the map selected
     Marker curMarker = null;
@@ -253,6 +253,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         {
                             // Remove the last marker, so a new one is created below
                             curMarker.remove();
+                            curMarker = null;
                         }
 
                         // Set a marker down to show where the LatLng is
@@ -266,7 +267,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         } );
 
-        // Set other button to disable LatLng mode
+        // Set this button to disable LatLng mode
         debugDisableFAB.setOnClickListener( new View.OnClickListener()
         {
             @Override
@@ -286,10 +287,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if( curMarker != null )
                 {
                     curMarker.remove();
+                    curMarker = null;
                 }
 
                 // ANNOUNCE!
                 Toast.makeText( getApplicationContext(), "LATLNG DEBUG MODE DISABLED", Toast.LENGTH_SHORT ).show();
+            }
+        } );
+
+        // Set this button to save the current latlng to an arraylist
+        debugAddLocationFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                // Save the location of the marker to the array
+                if( curMarker != null )
+                {
+                    // Save location
+                    debugLatLngArray.add( curMarker.getPosition() );
+
+                    // Remove the marker
+                    curMarker.remove();
+                    curMarker = null;
+
+                    // ANNOUNCE
+                    Toast.makeText( getApplicationContext(), "SAVED", Toast.LENGTH_SHORT ).show();
+                }
+                else
+                {
+                    Toast.makeText( getApplicationContext(), "Current LatLng has not been set", Toast.LENGTH_SHORT ).show();
+                }
             }
         } );
     }
