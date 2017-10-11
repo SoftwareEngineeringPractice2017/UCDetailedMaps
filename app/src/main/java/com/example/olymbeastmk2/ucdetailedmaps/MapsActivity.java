@@ -81,9 +81,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ListView mDrawerList;
     private MenuHandler menuHandler;
 
+    // Array that holds all LatLngs to be sent by email
+    ArrayList<LatLng> emailLatLngArray = new ArrayList<LatLng>();
 
-//    private ArrayList< MenuItem > menuItems;
-//    private ArrayList< MenuItem > currentMenu;
+    // The temporary placeholder for the current LatLng on the map selected
+    Marker curMarker;
 
     //Local stuff
     private ArrayList< Building > buildings;
@@ -207,11 +209,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         InitializeDrawer();
         menuHandler = new MenuHandler();
 
+        // Set up debug LatLng Menu
+        InitializeLatLngMenu();
+
         // Start updating the user's location
         startLocationUpdates();
 
         mapFragment.getMapAsync( this );
     }
+
+    private void InitializeLatLngMenu()
+    {
+        // Find the second floating action button
+        final FloatingActionButton debugFAB = ( FloatingActionButton ) findViewById( R.id.debugFAB );
+
+        // Set floating button to enable LatLng find mode
+        debugFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                // ANNOUNCE YOURSELF!
+                Toast.makeText( getApplicationContext(), "LATLNG DEBUG MODE ACTIVATED", Toast.LENGTH_SHORT ).show();
+
+                // Disable this button
+                debugFAB.setVisibility( FloatingActionButton.GONE );
+
+                // Have that when the button is clicked. We create a function that listens for taps
+                mMap.setOnMapClickListener( new GoogleMap.OnMapClickListener()
+                {
+                    @Override
+                    public void onMapClick( LatLng latLng )
+                    {
+                        //
+
+                        // Set a marker down to show where the LatLng is
+                        MarkerOptions tmpMarkOpt = new MarkerOptions().icon( BitmapDescriptorFactory.fromResource( R.mipmap.xmarksthespot ) ).position( latLng ).anchor( 0.5f, 0.5f );
+                        curMarker = mMap.addMarker( tmpMarkOpt );
+
+                        // Set the current latlng
+                        Toast.makeText( getApplicationContext(), "Current LatLng set!", Toast.LENGTH_SHORT ).show();
+                    }
+                } );
+            }
+        } );
+    }
+
 
     private void InitializeDrawer()
     {
@@ -229,29 +272,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         } );
 
-        // Find the second floating action button
-        FloatingActionButton debugFAB = ( FloatingActionButton ) findViewById( R.id.floatingActionButton );
-
-        // Set floating button to enable LatLng find mode
-        debugFAB.setOnClickListener( new View.OnClickListener()
-        {
-            @Override
-            public void onClick( View v )
-            {
-                // Have that when the button is clicked. We create a function that listens for taps
-                mMap.setOnMapClickListener( new GoogleMap.OnMapClickListener()
-                {
-                    @Override
-                    public void onMapClick( LatLng latLng )
-                    {
-
-                    }
-                } );
-            }
-        } );
-
-
-
         //Clear the drawer when it is opened.
         mDrawerLayout.addDrawerListener( new DrawerLayout.DrawerListener()
         {
@@ -264,7 +284,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onDrawerOpened( View drawerView )
             {
-
 
             }
 
@@ -391,6 +410,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady( GoogleMap googleMap )
     {
+        Toast.makeText( getApplicationContext(), "MAP IS READY", Toast.LENGTH_SHORT ).show();
+
         mMap = googleMap;
 
         // Check permissions for locations!
@@ -400,8 +421,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         // Set Maximum and Minimum Zoom
-        mMap.setMaxZoomPreference( 27 );
-        mMap.setMinZoomPreference( 12 );
+        mMap.setMaxZoomPreference( 40 );
+        mMap.setMinZoomPreference( 10 );
 
         // Add a marker in UC Campus
         LatLng Building22 = new LatLng( -35.240489, 149.088301 );

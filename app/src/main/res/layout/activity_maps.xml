@@ -24,8 +24,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:clickable="false"
-            />
+            android:layout_centerVertical="true"
+            app:fabSize="mini"
+            app:srcCompat="@android:drawable/ic_input_get" />
+
+        <!-- This one disables the LatLng Debug Mode -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/debugDisable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            app:fabSize="mini"
+            app:srcCompat="@android:drawable/ic_lock_idle_alarm" />
 
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"
@@ -59,10 +70,8 @@
             android:choiceMode="singleChoice"
             android:divider="@android:color/transparent"
             android:dividerHeight="0dp">
-
         </ListView>
     </LinearLayout>
-
 
 </android.support.v4.widget.DrawerLayout>
 
