@@ -45,9 +45,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="invisible"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
             app:fabSize="mini"
-            app:srcCompat="@android:drawable/ic_dialog_email" />
+            app:srcCompat="@android:drawable/ic_input_add" />
 
         <!-- This one removes the last LatLng in the array -->
         <android.support.design.widget.FloatingActionButton
@@ -55,14 +56,29 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="invisible"
-            android:layout_alignParentLeft="true"
-            android_layout_
+            android:layout_below="@id/debugDisableFAB"
             app:fabSize="mini"
-            app:srcCompat="@android:drawable/ic_dialog_email" />
+            app:srcCompat="@android:drawable/ic_menu_delete" />
 
         <!-- This one clears the entire list -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/debugClearListFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:layout_below="@id/debugRemoveLastLocationFAB"
+            app:fabSize="mini"
+            app:srcCompat="@android:drawable/ic_notification_clear_all" />
 
-        <!-- This one saves the entire array to the clipboard
+        <!-- This one saves the entire array to the clipboard as text -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/debugSaveToClipboardFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:layout_above="@id/debugAddLocationFAB"
+            app:fabSize="mini"
+            app:srcCompat="@android:drawable/ic_menu_save" />
 
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"

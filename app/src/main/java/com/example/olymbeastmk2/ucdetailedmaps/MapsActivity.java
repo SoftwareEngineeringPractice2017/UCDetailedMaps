@@ -1,6 +1,8 @@
 package com.example.olymbeastmk2.ucdetailedmaps;
 
 import android.app.DownloadManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -53,6 +55,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
+
+import static android.R.attr.label;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 {
@@ -225,6 +229,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final FloatingActionButton debugFAB = ( FloatingActionButton ) findViewById( R.id.debugFAB );
         final FloatingActionButton debugDisableFAB = ( FloatingActionButton ) findViewById( R.id.debugDisableFAB );
         final FloatingActionButton debugAddLocationFAB = ( FloatingActionButton ) findViewById( R.id.debugAddLocationFAB );
+        final FloatingActionButton debugRemoveLastLocationFAB = ( FloatingActionButton ) findViewById( R.id.debugRemoveLastLocationFAB );
+        final FloatingActionButton debugClearListFAB = ( FloatingActionButton ) findViewById( R.id.debugClearListFAB );
+        final FloatingActionButton debugSaveToClipboard = ( FloatingActionButton ) findViewById( R.id.debugSaveToClipboardFAB );
 
         // Set floating button to enable LatLng find mode
         debugFAB.setOnClickListener( new View.OnClickListener()
@@ -241,6 +248,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Enable the other buttons
                 debugDisableFAB.setVisibility( FloatingActionButton.VISIBLE );
                 debugAddLocationFAB.setVisibility( FloatingActionButton.VISIBLE );
+                debugRemoveLastLocationFAB.setVisibility( FloatingActionButton.VISIBLE );
+                debugClearListFAB.setVisibility( FloatingActionButton.VISIBLE );
+                debugSaveToClipboard.setVisibility( FloatingActionButton.VISIBLE );
 
                 // Have that when the button is clicked. We create a function that listens for taps
                 mMap.setOnMapClickListener( new GoogleMap.OnMapClickListener()
@@ -282,6 +292,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Make all the buttons invisible ( except the enable button of course )
                 debugDisableFAB.setVisibility( FloatingActionButton.INVISIBLE );
                 debugAddLocationFAB.setVisibility( FloatingActionButton.INVISIBLE );
+                debugRemoveLastLocationFAB.setVisibility( FloatingActionButton.INVISIBLE );
+                debugClearListFAB.setVisibility( FloatingActionButton.INVISIBLE );
+                debugSaveToClipboard.setVisibility( FloatingActionButton.INVISIBLE );
 
                 // Remove the 'X' marker if it is there
                 if( curMarker != null )
@@ -317,6 +330,84 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 else
                 {
                     Toast.makeText( getApplicationContext(), "Current LatLng has not been set", Toast.LENGTH_SHORT ).show();
+                }
+            }
+        } );
+
+        // Set this button to remove the last location in the arrayList
+        debugRemoveLastLocationFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                if( curMarker != null )
+                {
+                    // Remove last location from array
+                    if( debugLatLngArray.size() > 0 )
+                    {
+                        debugLatLngArray.remove( debugLatLngArray.size() - 1 );
+
+                        Toast.makeText( getApplicationContext(), "The most previous location has been removed", Toast.LENGTH_SHORT ).show();
+                    }
+                    else
+                    {
+                        Toast.makeText( getApplicationContext(), "There is nothing in the array!", Toast.LENGTH_SHORT ).show();
+                    }
+                }
+
+            }
+        } );
+
+        // Set this button to clear the entire list
+        debugClearListFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                if( debugLatLngArray.size() > 0 )
+                {
+                    debugLatLngArray.clear();
+
+                    Toast.makeText( getApplicationContext(), "Array completely cleared", Toast.LENGTH_SHORT ).show();
+                }
+                else
+                {
+                    Toast.makeText( getApplicationContext(), "Array already empty!", Toast.LENGTH_SHORT ).show();
+                }
+            }
+        } );
+
+        // Set this button to save the entire list to the clipboard
+        debugSaveToClipboard.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                if( debugLatLngArray.size() > 0 )
+                {
+                    // String Builder for making the full LatLng string to paste to clipboard
+                    StringBuilder stringToCopy = new StringBuilder( "" );
+
+                    // Loop through the LatLng arrayList
+                    for( LatLng l : debugLatLngArray )
+                    {
+                        stringToCopy.append( Double.toString( l.latitude ) );
+                        stringToCopy.append( ", " );
+                        stringToCopy.append( Double.toString( l.longitude ) );
+                        stringToCopy.append( "\n" );
+                    }
+
+                    // Got info from here: https://stackoverflow.com/questions/19253786/how-to-copy-text-to-clip-board-in-android
+                    // This will copy the Location information into the clipboard
+                    ClipboardManager cb = ( ClipboardManager ) getSystemService( Context.CLIPBOARD_SERVICE );
+                    ClipData clip = ClipData.newPlainText( "Location information", stringToCopy.toString() );
+                    cb.setPrimaryClip( clip );
+
+                    Toast.makeText( getApplicationContext(), "Array saved to Clipboard!", Toast.LENGTH_SHORT ).show();
+                }
+                else
+                {
+                    Toast.makeText( getApplicationContext(), "Array is empty! Can't save!", Toast.LENGTH_SHORT ).show();
                 }
             }
         } );
