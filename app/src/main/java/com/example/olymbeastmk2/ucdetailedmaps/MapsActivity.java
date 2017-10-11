@@ -242,9 +242,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onMapClick( LatLng latLng )
                     {
                         // Check to see if a marker was set
-                        if( !curMarker )
+                        if( curMarker != null )
                         {
-
+                            // Remove the last marker, so a new one is created below
+                            curMarker.remove();
                         }
 
                         // Set a marker down to show where the LatLng is
