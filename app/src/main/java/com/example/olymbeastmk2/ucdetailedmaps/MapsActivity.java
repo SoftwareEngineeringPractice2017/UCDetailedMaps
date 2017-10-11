@@ -233,7 +233,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Toast.makeText( getApplicationContext(), "LATLNG DEBUG MODE ACTIVATED", Toast.LENGTH_SHORT ).show();
 
                 // Disable this button
-                debugFAB.setVisibility( FloatingActionButton.GONE );
+                debugFAB.setVisibility( FloatingActionButton.INVISIBLE );
 
                 // Have that when the button is clicked. We create a function that listens for taps
                 mMap.setOnMapClickListener( new GoogleMap.OnMapClickListener()
