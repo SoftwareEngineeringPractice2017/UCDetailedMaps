@@ -224,6 +224,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Find the second floating action button
         final FloatingActionButton debugFAB = ( FloatingActionButton ) findViewById( R.id.debugFAB );
         final FloatingActionButton debugDisableFAB = ( FloatingActionButton ) findViewById( R.id.debugDisableFAB );
+        final FloatingActionButton debugAddLocationFAB = ( FloatingActionButton ) findViewById( R.id.debugAddLocationFAB );
 
         // Set floating button to enable LatLng find mode
         debugFAB.setOnClickListener( new View.OnClickListener()
@@ -236,7 +237,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 // Disable this button
                 debugFAB.setVisibility( FloatingActionButton.INVISIBLE );
+
+                // Enable the other buttons
                 debugDisableFAB.setVisibility( FloatingActionButton.VISIBLE );
+                debugAddLocationFAB.setVisibility( FloatingActionButton.VISIBLE );
 
                 // Have that when the button is clicked. We create a function that listens for taps
                 mMap.setOnMapClickListener( new GoogleMap.OnMapClickListener()
@@ -274,8 +278,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Make the other button visible again
                 debugFAB.setVisibility( FloatingActionButton.VISIBLE );
 
-                // Make this button invisible
+                // Make all the buttons invisible ( except the enable button of course )
                 debugDisableFAB.setVisibility( FloatingActionButton.INVISIBLE );
+                debugAddLocationFAB.setVisibility( FloatingActionButton.INVISIBLE );
 
                 // Remove the 'X' marker if it is there
                 if( curMarker != null )
