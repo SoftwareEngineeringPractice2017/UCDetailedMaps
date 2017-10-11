@@ -85,7 +85,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ArrayList<LatLng> emailLatLngArray = new ArrayList<LatLng>();
 
     // The temporary placeholder for the current LatLng on the map selected
-    Marker curMarker;
+    Marker curMarker = null;
 
     //Local stuff
     private ArrayList< Building > buildings;
@@ -241,13 +241,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onMapClick( LatLng latLng )
                     {
-                        //
+                        // Check to see if a marker was set
+                        if( !curMarker )
+                        {
+
+                        }
 
                         // Set a marker down to show where the LatLng is
                         MarkerOptions tmpMarkOpt = new MarkerOptions().icon( BitmapDescriptorFactory.fromResource( R.mipmap.xmarksthespot ) ).position( latLng ).anchor( 0.5f, 0.5f );
                         curMarker = mMap.addMarker( tmpMarkOpt );
 
-                        // Set the current latlng
+                        // Announce!
                         Toast.makeText( getApplicationContext(), "Current LatLng set!", Toast.LENGTH_SHORT ).show();
                     }
                 } );
