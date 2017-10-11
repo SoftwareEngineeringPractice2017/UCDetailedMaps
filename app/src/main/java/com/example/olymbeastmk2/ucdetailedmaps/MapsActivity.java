@@ -62,6 +62,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //Location Stuff
     private FusedLocationProviderClient mFusedLocationClient;
 
+    // Location Request
     private LocationRequest mLocationRequest;
 
     // 10 Seconds
