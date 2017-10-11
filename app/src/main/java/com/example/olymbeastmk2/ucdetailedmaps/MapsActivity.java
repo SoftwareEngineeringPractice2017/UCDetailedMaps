@@ -223,6 +223,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         // Find the second floating action button
         final FloatingActionButton debugFAB = ( FloatingActionButton ) findViewById( R.id.debugFAB );
+        final FloatingActionButton debugDisableFAB = ( FloatingActionButton ) findViewById( R.id.debugDisableFAB );
 
         // Set floating button to enable LatLng find mode
         debugFAB.setOnClickListener( new View.OnClickListener()
@@ -235,6 +236,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 // Disable this button
                 debugFAB.setVisibility( FloatingActionButton.INVISIBLE );
+                debugDisableFAB.setVisibility( FloatingActionButton.VISIBLE );
 
                 // Have that when the button is clicked. We create a function that listens for taps
                 mMap.setOnMapClickListener( new GoogleMap.OnMapClickListener()
@@ -257,6 +259,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Toast.makeText( getApplicationContext(), "Current LatLng set!", Toast.LENGTH_SHORT ).show();
                     }
                 } );
+            }
+        } );
+
+        // Set other button to disable LatLng mode
+        debugDisableFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                // This removes any function set for clicking on the map ( i.e. including what was set above this code )
+                mMap.setOnMapClickListener( null );
+
+                // Make the other button visible again
+                debugFAB.setVisibility( FloatingActionButton.VISIBLE );
+
+                // Make this button invisible
+                debugDisableFAB.setVisibility( FloatingActionButton.INVISIBLE );
+
+                // Remove the 'X' marker if it is there
+                if( curMarker != null )
+                {
+                    curMarker.remove();
+                }
+
+                // ANNOUNCE!
+                Toast.makeText( getApplicationContext(), "LATLNG DEBUG MODE DISABLED", Toast.LENGTH_SHORT ).show();
             }
         } );
     }

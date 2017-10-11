@@ -30,10 +30,12 @@
 
         <!-- This one disables the LatLng Debug Mode -->
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/debugDisable"
+            android:id="@+id/debugDisableFAB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/debugFAB"
+            android:layout_below="@id/debugFAB"
+            android:visibility="invisible"
+            android:layout_alignParentRight="true"
             app:fabSize="mini"
             app:srcCompat="@android:drawable/ic_lock_idle_alarm" />
 
