@@ -33,9 +33,9 @@
             android:id="@+id/debugDisableFAB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/debugFAB"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
             android:visibility="invisible"
-            android:layout_alignParentRight="true"
             app:fabSize="mini"
             app:srcCompat="@android:drawable/ic_lock_idle_alarm" />
 
@@ -44,11 +44,25 @@
             android:id="@+id/debugAddLocationFAB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/debugDisableFAB"
             android:visibility="invisible"
             android:layout_alignParentRight="true"
             app:fabSize="mini"
             app:srcCompat="@android:drawable/ic_dialog_email" />
+
+        <!-- This one removes the last LatLng in the array -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/debugRemoveLastLocationFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:layout_alignParentLeft="true"
+            android_layout_
+            app:fabSize="mini"
+            app:srcCompat="@android:drawable/ic_dialog_email" />
+
+        <!-- This one clears the entire list -->
+
+        <!-- This one saves the entire array to the clipboard
 
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"
