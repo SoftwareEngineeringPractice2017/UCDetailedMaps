@@ -56,7 +56,6 @@ import java.util.HashMap;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 {
-
     //Map Stuff
     private GoogleMap mMap;
 
@@ -220,7 +219,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mDrawerLayout = ( DrawerLayout ) findViewById( R.id.drawer_layout );
         mDrawerList = ( ListView ) findViewById( R.id.left_drawer );
 
-
         FloatingActionButton mFAB = ( FloatingActionButton ) findViewById( R.id.floatingActionButton );
         mFAB.setOnClickListener( new View.OnClickListener()
         {
@@ -230,6 +228,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mDrawerLayout.openDrawer( Gravity.START );
             }
         } );
+
+        // Find the second floating action button
+        FloatingActionButton debugFAB = ( FloatingActionButton ) findViewById( R.id.floatingActionButton );
+
+        // Set floating button to enable LatLng find mode
+        debugFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                // Have that when the button is clicked. We create a function that listens for taps
+                mMap.setOnMapClickListener( new GoogleMap.OnMapClickListener()
+                {
+                    @Override
+                    public void onMapClick( LatLng latLng )
+                    {
+
+                    }
+                } );
+            }
+        } );
+
+
 
         //Clear the drawer when it is opened.
         mDrawerLayout.addDrawerListener( new DrawerLayout.DrawerListener()
