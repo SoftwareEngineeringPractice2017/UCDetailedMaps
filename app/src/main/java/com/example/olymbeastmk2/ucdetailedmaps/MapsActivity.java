@@ -322,7 +322,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } );
     }
 
-
+    // Init Drawer
     private void InitializeDrawer()
     {
         //Drawer Layout
