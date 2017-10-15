@@ -11,7 +11,6 @@ import java.util.HashMap;
 public class MenuHandler {
 
     private ArrayList< MenuItem > menuItems;
-    private ArrayList< Boolean > checkedState;
     private ArrayList< MenuItem > currentMenu;
 
     public void populate(ArrayList< Building > _buildings, HashMap< String, ArrayList< Icon > > _icons)
@@ -46,16 +45,11 @@ public class MenuHandler {
         for(MenuItem m : output)
         {
             m.location = location++;
+            m.checked = location % 2 == 0;
         }
 
         menuItems = output;
         currentMenu = menuItems;
-
-        checkedState = new ArrayList< Boolean >();
-        for(MenuItem m : menuItems)
-        {
-            checkedState.add(true);
-        }
     }
 
     public void filter(String filter )
@@ -103,12 +97,12 @@ public class MenuHandler {
 
     public boolean getCheckedState(int index)
     {
-        return checkedState.get(index);
+        return menuItems.get(index).checked;
     }
 
     public void setCheckedState(int index, boolean value)
     {
-        checkedState.set(index, value);
+        menuItems.get(index).checked = value;
     }
 
     public int currentIndexToActualIndex(int index)

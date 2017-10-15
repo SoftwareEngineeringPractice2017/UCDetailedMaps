@@ -30,10 +30,10 @@ public class LatLngTools {
     //Pythagorean triangle.
     public static double getDistance(LatLng pointA, LatLng pointB)
     {
-        double a2 = pointA.latitude * pointA.latitude;
-        double b2 = pointB.longitude * pointB.longitude;
+        double a2 = Math.abs(pointA.latitude * pointA.latitude);
+        double b2 = Math.abs(pointB.longitude * pointB.longitude);
 
-        return Math.abs(Math.sqrt(a2 + b2));
+        return Math.sqrt(a2 + b2);
     }
 
     public static Icon findClosestIcon(LatLng location, ArrayList<Icon> icons)

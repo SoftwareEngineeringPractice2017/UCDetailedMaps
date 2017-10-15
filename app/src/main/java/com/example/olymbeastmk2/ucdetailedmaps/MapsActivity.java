@@ -499,14 +499,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String search = SearchBox.getText().toString();
 
         //This should be moved at a later point. Should only be called once.
-        menuHandler.populate(buildings, icons);
+        //menuHandler.populate(buildings, icons);
 
         menuHandler.filter( search );
 
         MenuAdapter menuAdapter = new MenuAdapter( this,
                 R.layout.drawer_list_item,
-                menuHandler.menuItemsNames(),
-                menuHandler.getCurrentMenu() );
+                menuHandler);
 
         mDrawerList.setAdapter( menuAdapter );
     }
@@ -648,6 +647,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 i.AddAsMarker( mMap, getResources() );
             }
         }
+
+
+        //Now that buildings and icons have values, populate the menu with them.
+        menuHandler.populate(buildings, icons);
     }
 
 }
