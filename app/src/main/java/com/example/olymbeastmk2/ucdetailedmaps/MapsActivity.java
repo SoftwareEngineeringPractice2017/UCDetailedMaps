@@ -210,9 +210,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Location stuff.
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient( this );
 
+        // Load buildings and icons with their respective data.
+        databaseLoadsIconsAndBuildings();
+
         // Setup the drawer.
         InitializeDrawer();
-        menuHandler = new MenuHandler();
+        menuHandler = new MenuHandler(this);
+        menuHandler.populate(buildings, icons);
 
         // Set up debug LatLng Menu
         InitializeLatLngMenu();
@@ -510,6 +514,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mDrawerList.setAdapter( menuAdapter );
     }
 
+//    public void refreshIconStates()
+//    {
+//        for(MenuItem m : menuHandler.getMenuItems())
+//        {
+//            if(m.type == MenuItem.ItemType.Icon)
+//            {
+//                setVisibleIconsWithType(m.text, !m.checked);
+//            }
+//        }
+//    }
+
+    public void setVisibleIconsWithType(String type, boolean hidden)
+    {
+        for(Icon i : icons.get(type))
+        {
+            i.setHidden(hidden);
+        }
+    }
+
     private void MenuItemClicked( int position )
     {
         float zoomLevel = 9;
@@ -555,6 +578,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ActivityCompat.requestPermissions( this, new String[]{ android.Manifest.permission.ACCESS_FINE_LOCATION }, 0 );
     }
 
+    private void databaseLoadsIconsAndBuildings()
+    {
+        // Initialize Database helper for all database needs
+        DbHelper dbBuildHelp = new DbHelper( this, "UCMapsDB", null, 1 );
+
+        //Temporary code for development. The database is constant even after updates in code.
+        //Therefore it is necessary to rebuild it each time the app is debugged, in case of changes.
+        dbBuildHelp.ClearEverything();
+        dbBuildHelp.BuildEverything();
+
+        // Get the resources ( mainly for the CSV file at the moment )
+        resources = getResources();
+
+        // Create a uri ( Full resource path name ) to get an ID from
+        String uri = MapsActivity.PACKAGE_NAME + ":raw/gpscoord2";
+
+        Log.d( "UCDetailedMap", "URI is: " + uri );
+
+        // Get the Resource ID of the CSV file
+        int rID = resources.getIdentifier( uri, null, null );
+
+        // Load the information from the CSV file into the database
+        // As GPSCoord is a raw resource, the extension is not included
+        dbBuildHelp.ImportCSVBuildings( rID, resources );
+
+        // Generate all Bitmaps for icons
+        dbBuildHelp.GenerateAllTypeImages( getResources() );
+
+        // Fill Building Array
+        buildings = dbBuildHelp.GetBuildings();
+
+        // Fill Icons Dictionary
+        icons = dbBuildHelp.GetIcons();
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -590,35 +648,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         float zoomLevel= 14;
         mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( UCBruceCampus, zoomLevel ) );
 
-        // Initialize Database helper for all database needs
-        DbHelper dbBuildHelp = new DbHelper( this, "UCMapsDB", null, 1 );
-
-        //Temporary code for development. The database is constant even after updates in code.
-        //Therefore it is necessary to rebuild it each time the app is debugged, in case of changes.
-        dbBuildHelp.ClearEverything();
-        dbBuildHelp.BuildEverything();
-
-        // Get the resources ( mainly for the CSV file at the moment )
-        resources = getResources();
-
-        // Create a uri ( Full resource path name ) to get an ID from
-        String uri = MapsActivity.PACKAGE_NAME + ":raw/gpscoord2";
-
-        Log.d( "UCDetailedMap", "URI is: " + uri );
-
-        // Get the Resource ID of the CSV file
-        int rID = resources.getIdentifier( uri, null, null );
-
-        // Load the information from the CSV file into the database
-        // As GPSCoord is a raw resource, the extension is not included
-        dbBuildHelp.ImportCSVBuildings( rID, resources );
-
-        // Generate all Bitmaps for icons
-        dbBuildHelp.GenerateAllTypeImages( getResources() );
-
-        // Building Array
-        buildings = dbBuildHelp.GetBuildings();
-
         for( Building b : buildings )
         {
             // Get the building's outline coordinates from the database
@@ -638,8 +667,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Polygon bPoly = mMap.addPolygon( bOptions );
         }
 
-        icons = dbBuildHelp.GetIcons();
-
         for(String s : icons.keySet())
         {
             for(Icon i : icons.get(s))
@@ -648,9 +675,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
 
+       for(MenuItem m : menuHandler.getMenuItems())
+       {
+          if(m.type == MenuItem.ItemType.Icon)
+          {
+            setVisibleIconsWithType(m.text, !m.checked);
+          }
+       }
 
-        //Now that buildings and icons have values, populate the menu with them.
-        menuHandler.populate(buildings, icons);
     }
 
 }

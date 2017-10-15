@@ -13,6 +13,13 @@ public class MenuHandler {
     private ArrayList< MenuItem > menuItems;
     private ArrayList< MenuItem > currentMenu;
 
+    private MapsActivity parent;
+
+    public MenuHandler(MapsActivity _Parent)
+    {
+        parent = _Parent;
+    }
+
     public void populate(ArrayList< Building > _buildings, HashMap< String, ArrayList< Icon > > _icons)
     {
         //ArrayList to be loaded and returned.
@@ -102,7 +109,12 @@ public class MenuHandler {
 
     public void setCheckedState(int index, boolean value)
     {
-        menuItems.get(index).checked = value;
+        MenuItem target = menuItems.get(index);
+        target.checked = value;
+        if(target.type == MenuItem.ItemType.Icon)
+        {
+            parent.setVisibleIconsWithType(target.text, !value);
+        }
     }
 
     public int currentIndexToActualIndex(int index)

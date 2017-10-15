@@ -1,6 +1,7 @@
 package com.example.olymbeastmk2.ucdetailedmaps;
 
 import android.content.Context;
+import android.opengl.Visibility;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -27,12 +28,6 @@ public class MenuAdapter extends ArrayAdapter<String>{
         menuHandler = objects;
     }
 
-//    public MenuAdapter(Context context, int resource, ArrayList<String> superObjects, ArrayList<MenuItem> objects) {
-//        super (context, resource, superObjects);
-//        elements = objects;
-//    }
-
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -43,12 +38,20 @@ public class MenuAdapter extends ArrayAdapter<String>{
 
 
         final int actualLocation = menuHandler.currentIndexToActualIndex(position);
-
-        TextView label = (TextView) convertView.findViewById(R.id.textView);
-        label.setText(menuHandler.getCurrentMenu().get(position).text);
-
+        String addSpaces = "";
 
         CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
+
+        if(menuHandler.get(actualLocation).type == MenuItem.ItemType.Building)
+        {
+            checkBox.setVisibility(View.GONE);
+            addSpaces = "  ";
+        }
+        else
+        {
+            checkBox.setVisibility(View.VISIBLE);
+        }
+
         checkBox.setChecked(menuHandler.getCheckedState(actualLocation));
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,6 +59,9 @@ public class MenuAdapter extends ArrayAdapter<String>{
                 menuHandler.setCheckedState(actualLocation, !menuHandler.getCheckedState(actualLocation));
             }
         });
+
+        TextView label = (TextView) convertView.findViewById(R.id.textView);
+        label.setText(addSpaces + menuHandler.getCurrentMenu().get(position).text);
 
         return convertView;
     }
