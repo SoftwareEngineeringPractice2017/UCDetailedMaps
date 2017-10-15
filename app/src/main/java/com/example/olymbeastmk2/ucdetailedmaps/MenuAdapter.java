@@ -43,12 +43,9 @@ public class MenuAdapter extends ArrayAdapter<String>{
 
 
         final int actualLocation = menuHandler.currentIndexToActualIndex(position);
-        final View holdConvertView = convertView;
-
-        String debugString = ":" + position + "," + actualLocation + "," + menuHandler.getCurrentMenu().get(position).location;
 
         TextView label = (TextView) convertView.findViewById(R.id.textView);
-        label.setText(menuHandler.getCurrentMenu().get(position).text.concat(debugString));
+        label.setText(menuHandler.getCurrentMenu().get(position).text);
 
 
         CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
