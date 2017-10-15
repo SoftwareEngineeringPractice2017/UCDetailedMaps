@@ -29,7 +29,7 @@ public class Icon
     private LatLng location;
     private boolean hasLocation;
 
-    private Marker marker = null;
+    public Marker marker = null;
 
     public Icon(int _id, DbHelper _parent)
     {
@@ -108,12 +108,7 @@ public class Icon
 
     // This will make sure that an icon has not been added once
     boolean hasBeenAddedToMap = false;
-
-    // Hide function variables:
-    private boolean isHidden = false;
-    // Store some values so that icons can be readded as needed.
-    GoogleMap holdMap = null;
-    Resources holdResources = null;
+    
 
     // This adds an icon as a marker to the map and stores the marker information ( For Future reference )
     public void AddAsMarker( GoogleMap mMap, Resources resources )
@@ -125,46 +120,14 @@ public class Icon
 
         marker = mMap.addMarker( mkrOptPass );
 
-        // Store variables for hide functions.
-        holdMap = mMap;
-        holdResources = resources;
-
         // Indicate that this icon is on the map.
         hasBeenAddedToMap = true;
     }
 
-    public void hide()
-    {
-        if(hasBeenAddedToMap && !isHidden)
-        {
-            marker.remove();
-            isHidden = true;
-        }
-    }
-
-    public void show()
-    {
-        if(hasBeenAddedToMap && isHidden)
-        {
-            AddAsMarker(holdMap, holdResources);
-            isHidden = false;
-        }
-    }
 
     public void setHidden(boolean hidden)
     {
-        if(hidden)
-        {
-            hide();
-        }
-        else
-        {
-            show();
-        }
+        marker.setVisible(!hidden);
     }
 
-    public boolean getHidden()
-    {
-        return isHidden;
-    }
 }

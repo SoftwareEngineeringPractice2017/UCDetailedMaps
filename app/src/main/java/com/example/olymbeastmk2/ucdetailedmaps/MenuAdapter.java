@@ -62,6 +62,13 @@ public class MenuAdapter extends ArrayAdapter<String>{
 
         TextView label = (TextView) convertView.findViewById(R.id.textView);
         label.setText(addSpaces + menuHandler.getCurrentMenu().get(position).text);
+        label.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                menuHandler.setCheckedState(actualLocation, true);
+                menuHandler.focus(actualLocation);
+            }
+        });
 
         return convertView;
     }

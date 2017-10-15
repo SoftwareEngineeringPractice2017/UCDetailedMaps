@@ -117,6 +117,11 @@ public class MenuHandler {
         }
     }
 
+    public void focus(int position)
+    {
+        parent.FocusOnMenuItem(position);
+    }
+
     public int currentIndexToActualIndex(int index)
     {
         return currentMenu.get(index).location;

@@ -96,6 +96,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ArrayList< Building > buildings;
     private HashMap< String, ArrayList< Icon > > icons;
 
+    private LatLng myLocation;
+
     public void getLastLocation()
     {
         // Get the last known recent location
@@ -136,6 +138,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // A LatLnt Object for use with maps is now created!
         LatLng userLocation = new LatLng( location.getLatitude(), location.getLongitude() );
+
+        // move global myLocation.
+        myLocation = new LatLng(userLocation.latitude, userLocation.longitude);
 
         // Create a marker on the users position ( if there is not already one there )
         if( userLocMarker == null )
@@ -484,16 +489,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 refreshDrawerListView();
             }
         } );
-
-
-        mDrawerList.setOnItemClickListener( new AdapterView.OnItemClickListener()
-        {
-            @Override
-            public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l )
-            {
-                MenuItemClicked( i );
-            }
-        } );
     }
 
     public void refreshDrawerListView()
@@ -514,17 +509,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mDrawerList.setAdapter( menuAdapter );
     }
 
-//    public void refreshIconStates()
-//    {
-//        for(MenuItem m : menuHandler.getMenuItems())
-//        {
-//            if(m.type == MenuItem.ItemType.Icon)
-//            {
-//                setVisibleIconsWithType(m.text, !m.checked);
-//            }
-//        }
-//    }
-
     public void setVisibleIconsWithType(String type, boolean hidden)
     {
         for(Icon i : icons.get(type))
@@ -533,15 +517,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void MenuItemClicked( int position )
+    public void FocusOnMenuItem(int menuItemPosition)
     {
-        float zoomLevel = 9;
+        mDrawerLayout = ( DrawerLayout ) findViewById( R.id.drawer_layout );
+        mDrawerLayout.closeDrawers();
+
+        float zoomLevel = 18;
         LatLng location = new LatLng( 0, 0 );
-        ;
 
-        MenuItem menuItem = menuHandler.get( menuHandler.currentIndexToActualIndex(position) );
+        MenuItem menuItem = menuHandler.get(menuItemPosition);
 
-        if( menuItem.type == MenuItem.ItemType.Building )
+        if(menuItem.type == MenuItem.ItemType.Building)
         {
             for( Building b : buildings )
             {
@@ -550,9 +536,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     location = LatLngTools.getCenter( b.getOutline() );
                 }
             }
-        } else
+        }
+        else
         {
+            Icon icon;
+            if(myLocation != null)
+            {
+                icon = LatLngTools.findClosestIcon(myLocation, icons.get(menuItem.text));
+            }
+            else
+            {
+                icon = icons.get(menuItem.text).get(0);
 
+            }
+
+            location = icon.getLocation();
         }
 
         mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( location, zoomLevel ) );
