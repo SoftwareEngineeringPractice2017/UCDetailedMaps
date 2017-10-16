@@ -339,7 +339,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         } );
 
-        // Set this button to save the current latlng to an arraylist
+        // Set this button to save the current latlng to an ArrayList
         debugAddLocationFAB.setOnClickListener( new View.OnClickListener()
         {
             @Override
