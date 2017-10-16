@@ -233,6 +233,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final FloatingActionButton debugClearListFAB = ( FloatingActionButton ) findViewById( R.id.debugClearListFAB );
         final FloatingActionButton debugSaveToClipboard = ( FloatingActionButton ) findViewById( R.id.debugSaveToClipboardFAB );
 
+        // Text field for inputting
+
         // Set floating button to enable LatLng find mode
         debugFAB.setOnClickListener( new View.OnClickListener()
         {
@@ -492,6 +494,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } );
     }
 
+    // Refresh Drawer List
     public void refreshDrawerListView()
     {
         EditText SearchBox = ( EditText ) findViewById( R.id.editText );

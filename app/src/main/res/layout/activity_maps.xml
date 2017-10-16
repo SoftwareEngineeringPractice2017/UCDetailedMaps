@@ -80,6 +80,13 @@
             app:fabSize="mini"
             app:srcCompat="@android:drawable/ic_menu_save" />
 
+        <EditText
+            android:id="+@id/debugEntryField"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"/>
+        
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
