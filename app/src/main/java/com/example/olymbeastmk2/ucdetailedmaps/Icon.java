@@ -29,7 +29,7 @@ public class Icon
     private LatLng location;
     private boolean hasLocation;
 
-    private Marker marker = null;
+    public Marker marker = null;
 
     public Icon(int _id, DbHelper _parent)
     {
@@ -108,6 +108,7 @@ public class Icon
 
     // This will make sure that an icon has not been added once
     boolean hasBeenAddedToMap = false;
+    
 
     // This adds an icon as a marker to the map and stores the marker information ( For Future reference )
     public void AddAsMarker( GoogleMap mMap, Resources resources )
@@ -119,6 +120,14 @@ public class Icon
 
         marker = mMap.addMarker( mkrOptPass );
 
+        // Indicate that this icon is on the map.
         hasBeenAddedToMap = true;
     }
+
+
+    public void setHidden(boolean hidden)
+    {
+        marker.setVisible(!hidden);
+    }
+
 }

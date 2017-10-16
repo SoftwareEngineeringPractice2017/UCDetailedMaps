@@ -109,6 +109,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ArrayList< Building > buildings;
     private HashMap< String, ArrayList< Icon > > icons;
 
+    private LatLng myLocation;
+
     public void getLastLocation()
     {
         // Get the last known recent location
@@ -149,6 +151,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // A LatLnt Object for use with maps is now created!
         LatLng userLocation = new LatLng( location.getLatitude(), location.getLongitude() );
+
+        // move global myLocation.
+        myLocation = new LatLng(userLocation.latitude, userLocation.longitude);
 
         // Create a marker on the users position ( if there is not already one there )
         if( userLocMarker == null )
@@ -223,9 +228,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Location stuff.
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient( this );
 
+        // Load buildings and icons with their respective data.
+        databaseLoadsIconsAndBuildings();
+
         // Setup the drawer.
         InitializeDrawer();
-        menuHandler = new MenuHandler();
+        menuHandler = new MenuHandler(this);
+        menuHandler.populate(buildings, icons);
 
         // Set up debug LatLng Menu
         InitializeLatLngMenu();
@@ -519,16 +528,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 refreshDrawerListView();
             }
         } );
-
-
-        mDrawerList.setOnItemClickListener( new AdapterView.OnItemClickListener()
-        {
-            @Override
-            public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l )
-            {
-                MenuItemClicked( i );
-            }
-        } );
     }
 
     // Refresh Drawer List
@@ -539,27 +538,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String search = SearchBox.getText().toString();
 
         //This should be moved at a later point. Should only be called once.
-        menuHandler.populate(buildings, icons);
+        //menuHandler.populate(buildings, icons);
 
         menuHandler.filter( search );
 
         MenuAdapter menuAdapter = new MenuAdapter( this,
                 R.layout.drawer_list_item,
-                menuHandler.menuItemsNames(),
-                menuHandler.getCurrentMenu() );
+                menuHandler);
 
         mDrawerList.setAdapter( menuAdapter );
     }
 
-    private void MenuItemClicked( int position )
+    public void setVisibleIconsWithType(String type, boolean hidden)
     {
-        float zoomLevel = 9;
+        for(Icon i : icons.get(type))
+        {
+            i.setHidden(hidden);
+        }
+    }
+
+    public void FocusOnMenuItem(int menuItemPosition)
+    {
+        mDrawerLayout = ( DrawerLayout ) findViewById( R.id.drawer_layout );
+        mDrawerLayout.closeDrawers();
+
+        float zoomLevel = 18;
         LatLng location = new LatLng( 0, 0 );
-        ;
 
-        MenuItem menuItem = menuHandler.get( menuHandler.currentIndexToActualIndex(position) );
+        MenuItem menuItem = menuHandler.get(menuItemPosition);
 
-        if( menuItem.type == MenuItem.ItemType.Building )
+        if(menuItem.type == MenuItem.ItemType.Building)
         {
             for( Building b : buildings )
             {
@@ -568,9 +576,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     location = LatLngTools.getCenter( b.getOutline() );
                 }
             }
-        } else
+        }
+        else
         {
+            Icon icon;
+            if(myLocation != null)
+            {
+                icon = LatLngTools.findClosestIcon(myLocation, icons.get(menuItem.text));
+            }
+            else
+            {
+                icon = icons.get(menuItem.text).get(0);
 
+            }
+
+            location = icon.getLocation();
         }
 
         mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( location, zoomLevel ) );
@@ -594,6 +614,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         // KEEP AN EYE ON THIS LINE, INT SHOULD PROBABLY NOT BE 0
         ActivityCompat.requestPermissions( this, new String[]{ android.Manifest.permission.ACCESS_FINE_LOCATION }, 0 );
+    }
+
+    private void databaseLoadsIconsAndBuildings()
+    {
+        // Initialize Database helper for all database needs
+        DbHelper dbBuildHelp = new DbHelper( this, "UCMapsDB", null, 1 );
+
+        //Temporary code for development. The database is constant even after updates in code.
+        //Therefore it is necessary to rebuild it each time the app is debugged, in case of changes.
+        dbBuildHelp.ClearEverything();
+        dbBuildHelp.BuildEverything();
+
+        // Get the resources ( mainly for the CSV file at the moment )
+        resources = getResources();
+
+        // Create a uri ( Full resource path name ) to get an ID from
+        String uri = MapsActivity.PACKAGE_NAME + ":raw/gpscoord2";
+
+        Log.d( "UCDetailedMap", "URI is: " + uri );
+
+        // Get the Resource ID of the CSV file
+        int rID = resources.getIdentifier( uri, null, null );
+
+        // Load the information from the CSV file into the database
+        // As GPSCoord is a raw resource, the extension is not included
+        dbBuildHelp.ImportCSVBuildings( rID, resources );
+
+        // Generate all Bitmaps for icons
+        dbBuildHelp.GenerateAllTypeImages( getResources() );
+
+        // Fill Building Array
+        buildings = dbBuildHelp.GetBuildings();
+
+        // Fill Icons Dictionary
+        icons = dbBuildHelp.GetIcons();
     }
 
     /**
@@ -631,35 +686,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         float zoomLevel= 14;
         mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( UCBruceCampus, zoomLevel ) );
 
-        // Initialize Database helper for all database needs
-        DbHelper dbBuildHelp = new DbHelper( this, "UCMapsDB", null, 1 );
-
-        //Temporary code for development. The database is constant even after updates in code.
-        //Therefore it is necessary to rebuild it each time the app is debugged, in case of changes.
-        dbBuildHelp.ClearEverything();
-        dbBuildHelp.BuildEverything();
-
-        // Get the resources ( mainly for the CSV file at the moment )
-        resources = getResources();
-
-        // Create a uri ( Full resource path name ) to get an ID from
-        String uri = MapsActivity.PACKAGE_NAME + ":raw/gpscoord2";
-
-        Log.d( "UCDetailedMap", "URI is: " + uri );
-
-        // Get the Resource ID of the CSV file
-        int rID = resources.getIdentifier( uri, null, null );
-
-        // Load the information from the CSV file into the database
-        // As GPSCoord is a raw resource, the extension is not included
-        dbBuildHelp.ImportCSVBuildings( rID, resources );
-
-        // Generate all Bitmaps for icons
-        dbBuildHelp.GenerateAllTypeImages( getResources() );
-
-        // Building Array
-        buildings = dbBuildHelp.GetBuildings();
-
         for( Building b : buildings )
         {
             // Get the building's outline coordinates from the database
@@ -679,8 +705,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Polygon bPoly = mMap.addPolygon( bOptions );
         }
 
-        icons = dbBuildHelp.GetIcons();
-
         for(String s : icons.keySet())
         {
             for(Icon i : icons.get(s))
@@ -688,6 +712,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 i.AddAsMarker( mMap, getResources() );
             }
         }
+
+       for(MenuItem m : menuHandler.getMenuItems())
+       {
+          if(m.type == MenuItem.ItemType.Icon)
+          {
+            setVisibleIconsWithType(m.text, !m.checked);
+          }
+       }
+
     }
 
 }

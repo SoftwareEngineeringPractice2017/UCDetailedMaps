@@ -1,6 +1,7 @@
 package com.example.olymbeastmk2.ucdetailedmaps;
 
 import android.content.Context;
+import android.opengl.Visibility;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -18,13 +19,14 @@ import java.util.ArrayList;
 
 public class MenuAdapter extends ArrayAdapter<String>{
 
-    ArrayList<MenuItem> elements = new ArrayList<MenuItem>();
+    //ArrayList<MenuItem> elements = new ArrayList<MenuItem>();
 
-    public MenuAdapter(Context context, int resource, ArrayList<String> superObjects, ArrayList<MenuItem> objects) {
-        super (context, resource, superObjects);
-        elements = objects;
+    MenuHandler menuHandler;
+
+    public MenuAdapter(Context context, int resource, MenuHandler objects) {
+        super (context, resource, objects.menuItemsNames());
+        menuHandler = objects;
     }
-
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -34,17 +36,39 @@ public class MenuAdapter extends ArrayAdapter<String>{
                     inflate(R.layout.drawer_list_item, parent, false);
         }
 
-        CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
-        checkBox.setChecked(elements.get(position).checked);
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
+        final int actualLocation = menuHandler.currentIndexToActualIndex(position);
+        String addSpaces = "";
+
+        CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
+
+        if(menuHandler.get(actualLocation).type == MenuItem.ItemType.Building)
+        {
+            checkBox.setVisibility(View.GONE);
+            addSpaces = "  ";
+        }
+        else
+        {
+            checkBox.setVisibility(View.VISIBLE);
+        }
+
+        checkBox.setChecked(menuHandler.getCheckedState(actualLocation));
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                menuHandler.setCheckedState(actualLocation, !menuHandler.getCheckedState(actualLocation));
             }
         });
 
         TextView label = (TextView) convertView.findViewById(R.id.textView);
-        label.setText(elements.get(position).text);
+        label.setText(addSpaces + menuHandler.getCurrentMenu().get(position).text);
+        label.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                menuHandler.setCheckedState(actualLocation, true);
+                menuHandler.focus(actualLocation);
+            }
+        });
 
         return convertView;
     }
