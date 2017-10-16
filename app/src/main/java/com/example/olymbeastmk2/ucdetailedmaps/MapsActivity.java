@@ -699,7 +699,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             // Instantiates a new Polyline object and add points to make the building
-            PolygonOptions bOptions = new PolygonOptions().addAll( latLngArr ).fillColor( 0xFFFF00FF );
+            PolygonOptions bOptions = new PolygonOptions().addAll( latLngArr ).fillColor( 0xFFFFFFFF );
 
             // Add the Polygon to Google maps
             Polygon bPoly = mMap.addPolygon( bOptions );
