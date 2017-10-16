@@ -692,7 +692,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             ArrayList<LatLng> latLngArr = b.getOutline();
 
             // If there are no points in this array, then skip to the next building
-            // ( Not sure if still valid... )
             if( latLngArr.isEmpty() )
             {
                 continue;
