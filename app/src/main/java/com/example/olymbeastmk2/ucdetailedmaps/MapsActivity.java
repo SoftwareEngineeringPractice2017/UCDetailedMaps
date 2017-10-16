@@ -75,6 +75,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // 2 Seconds
     private long FASTEST_INTERVAL = 2 * 1000;
 
+    // Inner Class for debug stuff only
+    private class NamedLocation
+    {
+        public String name;
+        public LatLng location;
+
+        public NamedLocation( String _name, LatLng _location )
+        {
+            name = _name;
+            location = _location;
+        }
+    }
+
     //Database Stuff
     // A Handle to the applications resources
     public Resources resources;
@@ -87,7 +100,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private MenuHandler menuHandler;
 
     // Array that holds all LatLngs to be sent by email
-    ArrayList<LatLng> debugLatLngArray = new ArrayList<LatLng>();
+    ArrayList<NamedLocation> debugLatLngArray = new ArrayList<NamedLocation>();
 
     // The temporary placeholder for the current LatLng on the map selected
     Marker curMarker = null;
@@ -233,7 +246,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final FloatingActionButton debugClearListFAB = ( FloatingActionButton ) findViewById( R.id.debugClearListFAB );
         final FloatingActionButton debugSaveToClipboard = ( FloatingActionButton ) findViewById( R.id.debugSaveToClipboardFAB );
 
-        // Text field for inputting
+        // Text field for inputting a label for the LatLng
+        final EditText debugEntryField = ( EditText ) findViewById( R.id.debugEntryField );
 
         // Set floating button to enable LatLng find mode
         debugFAB.setOnClickListener( new View.OnClickListener()
@@ -253,6 +267,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 debugRemoveLastLocationFAB.setVisibility( FloatingActionButton.VISIBLE );
                 debugClearListFAB.setVisibility( FloatingActionButton.VISIBLE );
                 debugSaveToClipboard.setVisibility( FloatingActionButton.VISIBLE );
+
+                // Enable text field
+                debugEntryField.setVisibility( EditText.VISIBLE );
 
                 // Have that when the button is clicked. We create a function that listens for taps
                 mMap.setOnMapClickListener( new GoogleMap.OnMapClickListener()
@@ -298,6 +315,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 debugClearListFAB.setVisibility( FloatingActionButton.INVISIBLE );
                 debugSaveToClipboard.setVisibility( FloatingActionButton.INVISIBLE );
 
+                // Disable text field
+                debugEntryField.setVisibility( EditText.INVISIBLE );
+
                 // Remove the 'X' marker if it is there
                 if( curMarker != null )
                 {
@@ -319,15 +339,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Save the location of the marker to the array
                 if( curMarker != null )
                 {
-                    // Save location
-                    debugLatLngArray.add( curMarker.getPosition() );
+                    // Check to see if a label has been put in for this LatLng. Simply Continue if there is something in there!
+                    String entFieldString = debugEntryField.getText().toString();
+                    if( entFieldString.isEmpty() )
+                    {
+                        Toast.makeText( getApplicationContext(), "There's no name put in the field!", Toast.LENGTH_SHORT ).show();
+                    }
+                    else
+                    {
+                        // Create a temporary named location
+                        NamedLocation tmpLoc = new NamedLocation( entFieldString, curMarker.getPosition() );
 
-                    // Remove the marker
-                    curMarker.remove();
-                    curMarker = null;
+                        // Save label
+                        tmpLoc.name = entFieldString;
 
-                    // ANNOUNCE
-                    Toast.makeText( getApplicationContext(), "SAVED", Toast.LENGTH_SHORT ).show();
+                        // Save location
+                        debugLatLngArray.add( tmpLoc );
+
+                        // Remove the marker
+                        curMarker.remove();
+                        curMarker = null;
+
+                        // ANNOUNCE
+                        Toast.makeText( getApplicationContext(), "SAVED", Toast.LENGTH_SHORT ).show();
+                    }
                 }
                 else
                 {
@@ -391,11 +426,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     StringBuilder stringToCopy = new StringBuilder( "" );
 
                     // Loop through the LatLng arrayList
-                    for( LatLng l : debugLatLngArray )
+                    for( NamedLocation n : debugLatLngArray )
                     {
-                        stringToCopy.append( Double.toString( l.latitude ) );
+                        stringToCopy.append( n.name );
+                        stringToCopy.append( " " );
+                        stringToCopy.append( Double.toString( n.location.latitude ) );
                         stringToCopy.append( ", " );
-                        stringToCopy.append( Double.toString( l.longitude ) );
+                        stringToCopy.append( Double.toString( n.location.longitude ) );
                         stringToCopy.append( "\n" );
                     }
 

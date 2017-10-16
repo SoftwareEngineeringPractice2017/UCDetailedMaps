@@ -80,13 +80,6 @@
             app:fabSize="mini"
             app:srcCompat="@android:drawable/ic_menu_save" />
 
-        <EditText
-            android:id="+@id/debugEntryField"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"/>
-        
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
@@ -95,6 +88,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context="com.example.olymbeastmk2.ucdetailedmaps.MapsActivity"/>
+
+        <EditText
+            android:id="@+id/debugEntryField"
+            android:layout_width="200dip"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:visibility="invisible"
+            android:inputType="textNoSuggestions"/>
+        android:hint="LanLng Name" />
+
     </RelativeLayout>
     <!-- The navigation drawer -->
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
