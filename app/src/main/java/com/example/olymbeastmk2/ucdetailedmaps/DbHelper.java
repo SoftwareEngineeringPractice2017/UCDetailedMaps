@@ -378,29 +378,38 @@ public class DbHelper extends SQLiteOpenHelper
                     return false;
                 }
 
+                // Read the name of the building that we are adding data for
+                String buildingName = tmpString[0];
+
                 // Find the associated buildings ID
-                Cursor cursor - db.query( BUILDING_TABLE, )
+                Cursor cursor = db.query( BUILDING_TABLE, new String[] { BUILDING_ID }, BUILDING_NAME + " = " + buildingName, null, null, null, null );
+                cursor.moveToFirst();
 
-                for( int i = 1; i < num; i += 2 )
+                // The key of the building associated with these plans
+                int curBuildID = -1;
+
+                if( cursor.isAfterLast() )
                 {
-                    // Build the query to add this record information to the outlines table
-                    // Note that the OUTLINE_ID is not needed as it is auto incremented
-                    // tmpString[ i ] is the latitude, tmpString[ i + 1 ] is the longitude
+                    Log.e( "UCDetailedMaps", "The building could not be found: " + buildingName );
 
-                    /* OLD CODE
-                    String outlinePointQuery = "INSERT INTO " + OUTLINE_TABLE + "( " +
-                            OUTLINE_BUILDING_ID + ", " + OUTLINE_LAT + ", " + OUTLINE_LNG + ") " +
-                            "VALUES( " + tmpString[1] + ", " + tmpString[ i ] + ", " + tmpString[ i + 1 ] + ");";
-                    */
+                    return false;
+                }
+                else
+                {
+                    curBuildID = cursor.getInt( cursor.getColumnIndex( BUILDING_ID ) );
+                }
 
-                    ContentValues contentValues1 = new ContentValues();
-                    contentValues1.put(OUTLINE_BUILDING_ID, Integer.toString(rowID));
+                /*contentValues1.put(OUTLINE_BUILDING_ID, Integer.toString(rowID));
                     contentValues1.put(OUTLINE_LAT, tmpString[i]);
-                    contentValues1.put(OUTLINE_LNG, tmpString[i + 1]);
-                    db.insert(OUTLINE_TABLE, null, contentValues1);
+                    contentValues1.put(OUTLINE_LNG, tmpString[i + 1]);*/
 
-                    // Submit the query to add a new point for that building!
-                    //db.execSQL( outlinePointQuery );
+                for( int i = 1; i < num; i += 3 )
+                {
+                    ContentValues contentValuesNext = new ContentValues();
+                    contentValuesNext.put( PLANS_LAT, Double.parseDouble( tmpString[ i ] ) );
+                    contentValuesNext.put( PLANS_LNG, Double.parseDouble( tmpString[ i + 1 ] ) );
+                    contentValuesNext.put( PLANS_ROT, Double.parseDouble( tmpString[ i + 2 ] ) );
+                    db.insert( OUTLINE_TABLE, null, contentValuesNext );
                 }
             }
         }
