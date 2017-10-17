@@ -58,6 +58,11 @@ public class DbHelper extends SQLiteOpenHelper
     public static final String ICONTYPES_ID = "id";
     public static final String ICONTYPES_NAME = "name";
 
+    public static final String PLANS_TABLE = "planstable";
+    public static final String PLANS_ID = "id";
+    public static final String PLANS_LAT = "lat";
+    public static final String PLANS_LNG = "lng";
+    public static final String PLANS_ROT = "rot";
 
     public DbHelper( Context context, String name, SQLiteDatabase.CursorFactory factory, int version )
     {
@@ -84,6 +89,7 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL( "drop table if exists " + ENTRANCES_TABLE );
         db.execSQL( "drop table if exists " + ICONS_TABLE );
         db.execSQL( "drop table if exists " + ICONTYPES_TABLE );
+        db.execSQL( "drop table if exists " + PLANS_TABLE );
     }
 
     public void BuildEverything()
@@ -125,6 +131,13 @@ public class DbHelper extends SQLiteOpenHelper
                 ICONTYPES_ID + " integer primary key autoincrement, " +
                 ICONTYPES_NAME + " text)");
 
+        // Create a Table for holding Floor Plan Data
+        db.execSQL( "create table " + PLANS_TABLE + "(" +
+                PLANS_ID + " integer primary key autoincrement, " +
+                PLANS_LAT + "double, " +
+                PLANS_LNG + "double, " +
+                PLANS_ROT + "double, " +
+                " FOREIGN KEY (" + BUILDING_ID + ") REFERENCES " + BUILDING_TABLE + "(" + BUILDING_ID + "));" );
     }
 
     // Removes trailing commas in a line and returns the final string
@@ -165,12 +178,14 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL( "delete from " + ENTRANCES_TABLE );
         db.execSQL( "delete from " + ICONS_TABLE );
         db.execSQL( "delete from " + ICONTYPES_TABLE );
+        db.execSQL( "delete from " + PLANS_TABLE );
 
         try
         {
             // Boolean that indicates whether the '###' denoting string has been hit or not
             boolean tripleHashHit = false;
             boolean tripleMoneyHit = false;
+            boolean tripleAtHit = false;
 
             // 'Read in' one line to skip it as the first line is just titles for the fields
             buffer.readLine();
@@ -300,6 +315,16 @@ public class DbHelper extends SQLiteOpenHelper
             // Now start reading in the Icons themselves
             while( ( line = buffer.readLine() ) != null )
             {
+                // This will check for denoting string '@@@', which indicates that Plan Coordinates will be read in
+                if( line.startsWith( "@@@" ) )
+                {
+                    // Flip associated boolean to indicate that we have passed '$$$'
+                    tripleAtHit = true;
+
+                    // Break the loop as we are done loading in building coordinates
+                    break;
+                }
+
                 // Remove Trailing Commas
                 line = RemoveTrailingCommas( line );
 
@@ -318,6 +343,65 @@ public class DbHelper extends SQLiteOpenHelper
                 contentValues.put( ICONS_LNG, tmpString[3] );
 
                 db.insert(ICONS_TABLE, null, contentValues);
+            }
+
+            // Check to see if a '$$$' has been found, if not, something is wrong
+            if( !tripleAtHit )
+            {
+                Log.e( "UCDetailedMaps", "@@@ was NOT found after icons, aborting loading process");
+                return false;
+            }
+
+            Log.d( "UCDetailedMaps", "NOW LOADING PLAN DATA" );
+
+            while( ( line = buffer.readLine() ) != null )
+            {
+                // Remove Trailing Commas
+                line = RemoveTrailingCommas( line );
+
+                Log.d( "UCDetailedMaps", line );
+
+                // Temp string to hold seperated elements
+                String[] tmpString = line.split( "," );
+
+                // Create a contentValue to push to the Icon table in the database
+                ContentValues contentValues = new ContentValues();
+
+                // Get number of elements in the tmpString array to know how many entries will be added to the plans table
+                int num = tmpString.length;
+
+                // Make sure there is the correct number of points ( comma seperations )
+                if( ( num - 1 ) % 3 != 0 )
+                {
+                    // Throw error message and return false
+                    Log.e( "UCDetailedMapsApp", "num does not evenly divide!" );
+                    return false;
+                }
+
+                // Find the associated buildings ID
+                Cursor cursor - db.query( BUILDING_TABLE, )
+
+                for( int i = 1; i < num; i += 2 )
+                {
+                    // Build the query to add this record information to the outlines table
+                    // Note that the OUTLINE_ID is not needed as it is auto incremented
+                    // tmpString[ i ] is the latitude, tmpString[ i + 1 ] is the longitude
+
+                    /* OLD CODE
+                    String outlinePointQuery = "INSERT INTO " + OUTLINE_TABLE + "( " +
+                            OUTLINE_BUILDING_ID + ", " + OUTLINE_LAT + ", " + OUTLINE_LNG + ") " +
+                            "VALUES( " + tmpString[1] + ", " + tmpString[ i ] + ", " + tmpString[ i + 1 ] + ");";
+                    */
+
+                    ContentValues contentValues1 = new ContentValues();
+                    contentValues1.put(OUTLINE_BUILDING_ID, Integer.toString(rowID));
+                    contentValues1.put(OUTLINE_LAT, tmpString[i]);
+                    contentValues1.put(OUTLINE_LNG, tmpString[i + 1]);
+                    db.insert(OUTLINE_TABLE, null, contentValues1);
+
+                    // Submit the query to add a new point for that building!
+                    //db.execSQL( outlinePointQuery );
+                }
             }
         }
         catch( IOException exception )
