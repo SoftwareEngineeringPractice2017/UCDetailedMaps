@@ -88,6 +88,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    // Polygon Array for buildings for future use
+    ArrayList<Polygon> polyBuildArr = new ArrayList<Polygon>();
+
     //Database Stuff
     // A Handle to the applications resources
     public Resources resources;
@@ -245,6 +248,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync( this );
     }
 
+    // Bool var for indicating whether we want buildings on or off
+    boolean showBuildings = true;
+
     private void InitializeLatLngMenu()
     {
         // Find the second floating action button
@@ -254,6 +260,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final FloatingActionButton debugRemoveLastLocationFAB = ( FloatingActionButton ) findViewById( R.id.debugRemoveLastLocationFAB );
         final FloatingActionButton debugClearListFAB = ( FloatingActionButton ) findViewById( R.id.debugClearListFAB );
         final FloatingActionButton debugSaveToClipboard = ( FloatingActionButton ) findViewById( R.id.debugSaveToClipboardFAB );
+        final FloatingActionButton debugToggleBuildings = ( FloatingActionButton ) findViewById( R.id.debugToggleBuildingsFAB );
 
         // Text field for inputting a label for the LatLng
         final EditText debugEntryField = ( EditText ) findViewById( R.id.debugEntryField );
@@ -276,6 +283,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 debugRemoveLastLocationFAB.setVisibility( FloatingActionButton.VISIBLE );
                 debugClearListFAB.setVisibility( FloatingActionButton.VISIBLE );
                 debugSaveToClipboard.setVisibility( FloatingActionButton.VISIBLE );
+                debugToggleBuildings.setVisibility( FloatingActionButton.VISIBLE );
 
                 // Enable text field
                 debugEntryField.setVisibility( EditText.VISIBLE );
@@ -323,6 +331,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 debugRemoveLastLocationFAB.setVisibility( FloatingActionButton.INVISIBLE );
                 debugClearListFAB.setVisibility( FloatingActionButton.INVISIBLE );
                 debugSaveToClipboard.setVisibility( FloatingActionButton.INVISIBLE );
+                debugToggleBuildings.setVisibility( FloatingActionButton.INVISIBLE );
 
                 // Disable text field
                 debugEntryField.setVisibility( EditText.INVISIBLE );
@@ -456,6 +465,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 else
                 {
                     Toast.makeText( getApplicationContext(), "Array is empty! Can't save!", Toast.LENGTH_SHORT ).show();
+                }
+            }
+        } );
+
+        // Set this button to toggle buildings on and off
+        debugToggleBuildings.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                // Buildings are shown, toggle off
+                if( showBuildings )
+                {
+                    // Loop through all the Building Polygons, making them invisible
+                    for( Polygon p : polyBuildArr )
+                    {
+                        p.setVisible( false );
+                    }
+
+                    // Print a toast to success!
+                    Toast.makeText( getApplicationContext(), "Disabling Buildings", Toast.LENGTH_SHORT ).show();
+
+                    // Flip bool so that the button will have the opposite functionality when Clicked
+                    showBuildings = false;
+                }
+                else
+                {
+                    // Loop through each element in Polygon array and show them!
+                    for( Polygon p : polyBuildArr )
+                    {
+                        p.setVisible( true );
+                    }
+
+                    // Print a toast to success!
+                    Toast.makeText( getApplicationContext(), "Enabling Buildings", Toast.LENGTH_SHORT ).show();
+
+                    // Flip bool so that the button will have the opposite functionality when Clicked
+                    showBuildings = true;
                 }
             }
         } );
@@ -702,6 +749,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             // Add the Polygon to Google maps
             Polygon bPoly = mMap.addPolygon( bOptions );
+
+            // Add this to the Building Polygon Array for Future Use
+            polyBuildArr.add( bPoly );
         }
 
         for(String s : icons.keySet())
