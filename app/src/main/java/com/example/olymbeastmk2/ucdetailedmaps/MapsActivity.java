@@ -721,7 +721,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         // Set Maximum and Minimum Zoom
-        mMap.setMaxZoomPreference( 40 );
+        mMap.setMaxZoomPreference( 60 );
         mMap.setMinZoomPreference( 10 );
 
         // Add a marker in UC Campus
