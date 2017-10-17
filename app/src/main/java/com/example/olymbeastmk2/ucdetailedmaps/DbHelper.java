@@ -58,11 +58,13 @@ public class DbHelper extends SQLiteOpenHelper
     public static final String ICONTYPES_ID = "id";
     public static final String ICONTYPES_NAME = "name";
 
-    public static final String PLANS_TABLE = "planstable";
+    public static final String PLANS_TABLE = "plans";
     public static final String PLANS_ID = "id";
     public static final String PLANS_LAT = "lat";
     public static final String PLANS_LNG = "lng";
     public static final String PLANS_ROT = "rot";
+    public static final String PLANS_BUILDING_FK = "buildfkey";
+    public static final String PLANS_NAME = "name";
 
     public DbHelper( Context context, String name, SQLiteDatabase.CursorFactory factory, int version )
     {
@@ -134,10 +136,12 @@ public class DbHelper extends SQLiteOpenHelper
         // Create a Table for holding Floor Plan Data
         db.execSQL( "create table " + PLANS_TABLE + "(" +
                 PLANS_ID + " integer primary key autoincrement, " +
-                PLANS_LAT + "double, " +
-                PLANS_LNG + "double, " +
-                PLANS_ROT + "double, " +
-                " FOREIGN KEY (" + BUILDING_ID + ") REFERENCES " + BUILDING_TABLE + "(" + BUILDING_ID + "));" );
+                PLANS_BUILDING_FK + " integer, " +
+                PLANS_NAME + " text," +
+                PLANS_LAT + " double, " +
+                PLANS_LNG + " double, " +
+                PLANS_ROT + " double, " +
+                "FOREIGN KEY (" + PLANS_BUILDING_FK + ") REFERENCES " + BUILDING_TABLE + "(" + BUILDING_ID + "));" );
     }
 
     // Removes trailing commas in a line and returns the final string
@@ -354,6 +358,8 @@ public class DbHelper extends SQLiteOpenHelper
 
             Log.d( "UCDetailedMaps", "NOW LOADING PLAN DATA" );
 
+            final int NUMSEP = 4;
+
             while( ( line = buffer.readLine() ) != null )
             {
                 // Remove Trailing Commas
@@ -371,7 +377,7 @@ public class DbHelper extends SQLiteOpenHelper
                 int num = tmpString.length;
 
                 // Make sure there is the correct number of points ( comma seperations )
-                if( ( num - 1 ) % 3 != 0 )
+                if( ( num - 1 ) % NUMSEP != 0 )
                 {
                     // Throw error message and return false
                     Log.e( "UCDetailedMapsApp", "num does not evenly divide!" );
@@ -382,7 +388,7 @@ public class DbHelper extends SQLiteOpenHelper
                 String buildingName = tmpString[0];
 
                 // Find the associated buildings ID
-                Cursor cursor = db.query( BUILDING_TABLE, new String[] { BUILDING_ID }, BUILDING_NAME + " = " + buildingName, null, null, null, null );
+                Cursor cursor = db.query( BUILDING_TABLE, new String[] { BUILDING_ID }, BUILDING_NAME + " = \"" + buildingName + "\"", null, null, null, null );
                 cursor.moveToFirst();
 
                 // The key of the building associated with these plans
@@ -399,17 +405,16 @@ public class DbHelper extends SQLiteOpenHelper
                     curBuildID = cursor.getInt( cursor.getColumnIndex( BUILDING_ID ) );
                 }
 
-                /*contentValues1.put(OUTLINE_BUILDING_ID, Integer.toString(rowID));
-                    contentValues1.put(OUTLINE_LAT, tmpString[i]);
-                    contentValues1.put(OUTLINE_LNG, tmpString[i + 1]);*/
-
-                for( int i = 1; i < num; i += 3 )
+                // Insert vals into DB!
+                for( int i = 1; i < num; i += NUMSEP )
                 {
                     ContentValues contentValuesNext = new ContentValues();
-                    contentValuesNext.put( PLANS_LAT, Double.parseDouble( tmpString[ i ] ) );
-                    contentValuesNext.put( PLANS_LNG, Double.parseDouble( tmpString[ i + 1 ] ) );
-                    contentValuesNext.put( PLANS_ROT, Double.parseDouble( tmpString[ i + 2 ] ) );
-                    db.insert( OUTLINE_TABLE, null, contentValuesNext );
+                    contentValuesNext.put( PLANS_NAME, tmpString[ i ] );
+                    contentValuesNext.put( PLANS_LAT, Double.parseDouble( tmpString[ i + 1 ] ) );
+                    contentValuesNext.put( PLANS_LNG, Double.parseDouble( tmpString[ i + 2 ] ) );
+                    contentValuesNext.put( PLANS_ROT, Double.parseDouble( tmpString[ i + 3 ] ) );
+                    contentValuesNext.put( PLANS_BUILDING_FK, curBuildID );
+                    db.insert( PLANS_TABLE, null, contentValuesNext );
                 }
             }
         }
