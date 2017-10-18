@@ -8,14 +8,20 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
+import android.os.Build;
 import android.os.Looper;
+import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.text.Editable;
@@ -43,6 +49,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -90,6 +97,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Polygon Array for buildings for future use
     ArrayList<Polygon> polyBuildArr = new ArrayList<Polygon>();
+
+    // Floor Plans Array
+    HashMap<String, ArrayList<FloorPlan>> floorPlansHM;
 
     //Database Stuff
     // A Handle to the applications resources
@@ -696,6 +706,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Fill Icons Dictionary
         icons = dbBuildHelp.GetIcons();
+
+        // Fill Floor plans hashmap
+        floorPlansHM = dbBuildHelp.GetPlans();
     }
 
     /**
@@ -762,14 +775,54 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
 
-       for(MenuItem m : menuHandler.getMenuItems())
-       {
-          if(m.type == MenuItem.ItemType.Icon)
-          {
-            setVisibleIconsWithType(m.text, !m.checked);
-          }
-       }
+        for(MenuItem m : menuHandler.getMenuItems())
+        {
+            if(m.type == MenuItem.ItemType.Icon)
+            {
+                setVisibleIconsWithType(m.text, !m.checked);
+            }
+        }
 
+        // Add floor plans
+        for( HashMap.Entry<String, ArrayList<FloorPlan>> entry : floorPlansHM.entrySet() )
+        {
+            String key = entry.getKey();
+            ArrayList<FloorPlan> value = entry.getValue();
+
+            for( FloorPlan fp : value )
+            {
+                // Get full name of file
+                StringBuilder tmpStringBuild = new StringBuilder( "ic_" );
+                String[] tmpStringArr = key.split( " " );
+                tmpStringBuild.append( tmpStringArr[1] );
+                tmpStringBuild.append( fp.floor.toLowerCase() );
+
+                int resID = getResources().getIdentifier( tmpStringBuild.toString(), "drawable", getPackageName() );
+                Log.d( "UCDetailedMaps", "Resource String is: " + tmpStringBuild.toString() );
+                GroundOverlayOptions tmpOverlay = new GroundOverlayOptions()
+                        .image( BitmapDescriptorFactory.fromBitmap( getBitmapFromVectorDrawable( getApplicationContext(), resID ) ) )
+                        .position( fp.cornerLatLng, 1000f );
+                mMap.addGroundOverlay( tmpOverlay );
+            }
+        }
+
+    }
+
+    // Code was obtained from this location: https://stackoverflow.com/questions/33696488/getting-bitmap-from-vector-drawable
+    public Bitmap getBitmapFromVectorDrawable( Context context, int drawableId )
+    {
+        Drawable drawable = ContextCompat.getDrawable( context, drawableId );
+        if( Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP )
+        {
+            drawable = ( DrawableCompat.wrap( drawable ) ).mutate();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap( drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888 );
+        Canvas canvas = new Canvas( bitmap );
+        drawable.setBounds( 0, 0, canvas.getWidth(), canvas.getHeight() );
+        drawable.draw( canvas );
+
+        return bitmap;
     }
 
 }

@@ -459,7 +459,7 @@ public class DbHelper extends SQLiteOpenHelper
     final double SCALE_FACTOR = 0.5;
 
     // This gets the proper resource name string from the full name pulled from the database
-    private String ConvertToResourceString( String fullName )
+    public String ConvertToResourceString( String fullName )
     {
         // Replace all information: https://stackoverflow.com/questions/5455794/removing-whitespace-from-strings-in-java
         // More info: https://stackoverflow.com/questions/23332146/remove-punctuation-preserve-letters-and-white-space-java-regex
@@ -564,10 +564,10 @@ public class DbHelper extends SQLiteOpenHelper
     }
 
     // Returns a HashMap of Floor Plans
-    public ArrayList<FloorPlan> GetPlans()
+    public HashMap<String, ArrayList<FloorPlan>> GetPlans()
     {
         // The HashMap that will be returned
-        HashMap<String, ArrayList<VectorDrawable>> retHashMap = new HashMap<String, ArrayList<VectorDrawable>>();
+        HashMap<String, ArrayList<FloorPlan>> retHashMap = new HashMap<String, ArrayList<FloorPlan>>();
 
         SQLiteDatabase db = getReadableDatabase();
 
@@ -584,6 +584,7 @@ public class DbHelper extends SQLiteOpenHelper
 
             // Temporary res to get the name of the building
             Cursor tmpRes = db.rawQuery( "select * from " + BUILDING_TABLE + " where " + BUILDING_ID + " = " + Integer.toString( tmpBuildID ), null );
+            tmpRes.moveToFirst();
 
             // Should be only one record, so we will get it directly from the database without any checks
             String buildName = tmpRes.getString( tmpRes.getColumnIndex( BUILDING_NAME ) );
@@ -591,18 +592,37 @@ public class DbHelper extends SQLiteOpenHelper
             // ---
 
             // Check to see if the key for this building exists
-            if( retHashMap.containsKey( buildName ) )
+            if( !retHashMap.containsKey( buildName ) )
             {
-                // If it exists, simply add all entries related to that building
+                // Create an array list for all the floors to go into
+                ArrayList<FloorPlan> tmpFloorPlanArr = new ArrayList<FloorPlan>();
+
+                // If it does not exist, simply add all entries related to that building
                 Cursor relPlanRes = db.rawQuery( "select * from " + PLANS_TABLE + " where " + PLANS_BUILDING_FK + " = " + Integer.toString( tmpBuildID ), null );
+                relPlanRes.moveToFirst();
 
                 while( relPlanRes.isAfterLast() == false )
                 {
-                    relPlanRes.
+                    double tmpLat = relPlanRes.getDouble( relPlanRes.getColumnIndex( PLANS_LAT ) );
+                    double tmpLng = relPlanRes.getDouble( relPlanRes.getColumnIndex( PLANS_LNG ) );
+                    double tmpRot = relPlanRes.getDouble( relPlanRes.getColumnIndex( PLANS_ROT ) );
+                    String tmpFloor = relPlanRes.getString( relPlanRes.getColumnIndex( PLANS_NAME ) );
+
+                    FloorPlan tmpFloorPlan = new FloorPlan( new LatLng( tmpLat, tmpLng ), tmpRot, tmpFloor );
+
+                    // Store floor in array
+                    tmpFloorPlanArr.add( tmpFloorPlan );
+
+                    relPlanRes.moveToNext();
                 }
+
+                // Add the temporary array to the HashMap with its associated Building String
+                retHashMap.put( buildName, tmpFloorPlanArr );
             }
 
             res.moveToNext();
         }
+
+        return retHashMap;
     }
 }
