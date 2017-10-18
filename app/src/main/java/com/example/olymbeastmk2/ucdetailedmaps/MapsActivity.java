@@ -48,7 +48,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -746,6 +748,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         float zoomLevel= 14;
         mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( UCBruceCampus, zoomLevel ) );
 
+        // Add floor plans
+        for( HashMap.Entry<String, ArrayList<FloorPlan>> entry : floorPlansHM.entrySet() )
+        {
+            String key = entry.getKey();
+            ArrayList<FloorPlan> value = entry.getValue();
+
+            for( FloorPlan fp : value )
+            {
+                // Get full name of file
+                StringBuilder tmpStringBuild = new StringBuilder( "f" );
+                String[] tmpStringArr = key.split( " " );
+                tmpStringBuild.append( tmpStringArr[1] );
+                tmpStringBuild.append( fp.floor.toLowerCase() );
+
+                int resID = getResources().getIdentifier( tmpStringBuild.toString(), "drawable", getPackageName() );
+                Log.d( "UCDetailedMaps", "Resource String is: " + tmpStringBuild.toString() );
+                GroundOverlayOptions tmpOverlay = new GroundOverlayOptions()
+                        .image( BitmapDescriptorFactory.fromResource( resID ) )
+                        .position( fp.cornerLatLng, 150f );
+                mMap.addGroundOverlay( tmpOverlay );
+            }
+        }
+
         for( Building b : buildings )
         {
             // Get the building's outline coordinates from the database
@@ -783,28 +808,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
 
-        // Add floor plans
-        for( HashMap.Entry<String, ArrayList<FloorPlan>> entry : floorPlansHM.entrySet() )
+        // Set up listener to hide or show buildings
+        mMap.setOnCameraMoveListener( new GoogleMap.OnCameraMoveListener()
         {
-            String key = entry.getKey();
-            ArrayList<FloorPlan> value = entry.getValue();
-
-            for( FloorPlan fp : value )
+            @Override
+            public void onCameraMove()
             {
-                // Get full name of file
-                StringBuilder tmpStringBuild = new StringBuilder( "ic_" );
-                String[] tmpStringArr = key.split( " " );
-                tmpStringBuild.append( tmpStringArr[1] );
-                tmpStringBuild.append( fp.floor.toLowerCase() );
-
-                int resID = getResources().getIdentifier( tmpStringBuild.toString(), "drawable", getPackageName() );
-                Log.d( "UCDetailedMaps", "Resource String is: " + tmpStringBuild.toString() );
-                GroundOverlayOptions tmpOverlay = new GroundOverlayOptions()
-                        .image( BitmapDescriptorFactory.fromBitmap( getBitmapFromVectorDrawable( getApplicationContext(), resID ) ) )
-                        .position( fp.cornerLatLng, 1000f );
-                mMap.addGroundOverlay( tmpOverlay );
+                CameraPosition cameraPosition = mMap.getCameraPosition();
+                if( cameraPosition.zoom > 20.0 )
+                {
+                    // Loop through all the Building Polygons, making them invisible
+                    for( Polygon p : polyBuildArr )
+                    {
+                        p.setVisible( false );
+                    }
+                }
+                else
+                {
+                    // Loop through all the Building Polygons, making them visible
+                    for( Polygon p : polyBuildArr )
+                    {
+                        p.setVisible( true );
+                    }
+                }
             }
-        }
+        });
 
     }
 
