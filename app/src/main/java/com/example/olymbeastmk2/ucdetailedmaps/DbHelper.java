@@ -564,9 +564,45 @@ public class DbHelper extends SQLiteOpenHelper
     }
 
     // Returns a HashMap of Floor Plans
-    public HashMap<String, VectorDrawable> GetPlans()
+    public ArrayList<FloorPlan> GetPlans()
     {
-        Cursor res = getReadableDatabase().rawQuery( "select * from " + PLANS_TABLE, null );
+        // The HashMap that will be returned
+        HashMap<String, ArrayList<VectorDrawable>> retHashMap = new HashMap<String, ArrayList<VectorDrawable>>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor res = db.rawQuery( "select * from " + PLANS_TABLE, null );
         res.moveToFirst();
+
+        while( res.isAfterLast() == false )
+        {
+            // Get the name that these floor plans relate
+            // ---
+
+            // Get ID from the PLANS_TABLE
+            int tmpBuildID = res.getInt( res.getColumnIndex( PLANS_BUILDING_FK ) );
+
+            // Temporary res to get the name of the building
+            Cursor tmpRes = db.rawQuery( "select * from " + BUILDING_TABLE + " where " + BUILDING_ID + " = " + Integer.toString( tmpBuildID ), null );
+
+            // Should be only one record, so we will get it directly from the database without any checks
+            String buildName = tmpRes.getString( tmpRes.getColumnIndex( BUILDING_NAME ) );
+
+            // ---
+
+            // Check to see if the key for this building exists
+            if( retHashMap.containsKey( buildName ) )
+            {
+                // If it exists, simply add all entries related to that building
+                Cursor relPlanRes = db.rawQuery( "select * from " + PLANS_TABLE + " where " + PLANS_BUILDING_FK + " = " + Integer.toString( tmpBuildID ), null );
+
+                while( relPlanRes.isAfterLast() == false )
+                {
+                    relPlanRes.
+                }
+            }
+
+            res.moveToNext();
+        }
     }
 }
