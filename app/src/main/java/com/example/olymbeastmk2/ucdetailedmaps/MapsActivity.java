@@ -815,7 +815,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onCameraMove()
             {
                 CameraPosition cameraPosition = mMap.getCameraPosition();
-                if( cameraPosition.zoom > 20.0 )
+                if( cameraPosition.zoom > 19.0 )
                 {
                     // Loop through all the Building Polygons, making them invisible
                     for( Polygon p : polyBuildArr )
@@ -837,6 +837,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     // Code was obtained from this location: https://stackoverflow.com/questions/33696488/getting-bitmap-from-vector-drawable
+    // +++
     public Bitmap getBitmapFromVectorDrawable( Context context, int drawableId )
     {
         Drawable drawable = ContextCompat.getDrawable( context, drawableId );
