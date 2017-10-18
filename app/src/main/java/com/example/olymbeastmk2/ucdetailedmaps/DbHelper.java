@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.VectorDrawable;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -560,5 +561,12 @@ public class DbHelper extends SQLiteOpenHelper
         }
 
         return output;
+    }
+
+    // Returns a HashMap of Floor Plans
+    public HashMap<String, VectorDrawable> GetPlans()
+    {
+        Cursor res = getReadableDatabase().rawQuery( "select * from " + PLANS_TABLE, null );
+        res.moveToFirst();
     }
 }
