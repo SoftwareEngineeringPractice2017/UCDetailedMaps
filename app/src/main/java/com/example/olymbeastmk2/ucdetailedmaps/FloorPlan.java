@@ -3,6 +3,7 @@ package com.example.olymbeastmk2.ucdetailedmaps;
 import android.graphics.drawable.VectorDrawable;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.LatLng;
 
 import static android.R.attr.key;
@@ -13,14 +14,15 @@ import static android.R.attr.key;
 
 public class FloorPlan
 {
-    public LatLng cornerLatLng;
+    public LatLng latLng;
     public double rotationDegrees;
     public String floor;
     public float scale;
+    public GroundOverlay groundMapRef;
 
     public FloorPlan( LatLng cll, double rD, String f, float s )
     {
-        cornerLatLng = cll;
+        latLng = cll;
         rotationDegrees = rD;
         floor = f;
         scale = s;

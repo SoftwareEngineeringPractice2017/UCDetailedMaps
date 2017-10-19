@@ -64,6 +64,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import static android.R.attr.label;
 
@@ -102,6 +105,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Floor Plans Array
     HashMap<String, ArrayList<FloorPlan>> floorPlansHM;
+
+    // An Iterator will be used to loop through this set
+    Set<HashMap.Entry<String, ArrayList<FloorPlan>>> curFloorPlanSet = null;
+    Iterator<HashMap<String, ArrayList<FloorPlan>>> cFIterator = null;
 
     //Database Stuff
     // A Handle to the applications resources
@@ -278,7 +285,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final FloatingActionButton FPDisableFAB = ( FloatingActionButton ) findViewById( R.id.FPDisableFAB );
         final FloatingActionButton FPDownFAB = ( FloatingActionButton ) findViewById( R.id.FPDownFAB );
         final FloatingActionButton FPLeftFAB = ( FloatingActionButton ) findViewById( R.id.FPLeftFAB );
-        final FloatingActioNButton FPRight
+        final FloatingActionButton FPRightFAB = ( FloatingActionButton ) findViewById( R.id.FPRightFAB );
+        final FloatingActionButton FPUpFAB = ( FloatingActionButton ) findViewById( R.id.FPUpFAB );
+        final FloatingActionButton FPSelectFAB = ( FloatingActionButton ) findViewById( R.id.FPSelectFAB );
 
         // Text field for inputting a label for the LatLng
         final EditText debugEntryField = ( EditText ) findViewById( R.id.debugEntryField );
@@ -525,8 +534,62 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         } );
 
-        // Set this button to enable Floor Plans mode
+        // Set this button to enable Floor Plans Debug Mode
+        FPFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                FPFAB.setVisibility( FloatingActionButton.INVISIBLE );
+                debugFAB.setVisibility( FloatingActionButton.INVISIBLE );
 
+                FPDisableFAB.setVisibility( FloatingActionButton.VISIBLE );
+                FPDownFAB.setVisibility( FloatingActionButton.VISIBLE );
+                FPUpFAB.setVisibility( FloatingActionButton.VISIBLE );
+                FPLeftFAB.setVisibility( FloatingActionButton.VISIBLE );
+                FPRightFAB.setVisibility( FloatingActionButton.VISIBLE );
+                FPSelectFAB.setVisibility( FloatingActionButton.VISIBLE );
+
+                // Announce!
+                Toast.makeText( getApplicationContext(), "Floor Plan Debug Mode Activated", Toast.LENGTH_SHORT ).show();
+            }
+        } );
+
+        // Set this button to disable Floor Plans Debug Mode
+        FPDisableFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                FPFAB.setVisibility( FloatingActionButton.VISIBLE );
+                debugFAB.setVisibility( FloatingActionButton.VISIBLE );
+
+                FPDisableFAB.setVisibility( FloatingActionButton.INVISIBLE );
+                FPDownFAB.setVisibility( FloatingActionButton.INVISIBLE );
+                FPUpFAB.setVisibility( FloatingActionButton.INVISIBLE );
+                FPLeftFAB.setVisibility( FloatingActionButton.INVISIBLE );
+                FPRightFAB.setVisibility( FloatingActionButton.INVISIBLE );
+                FPSelectFAB.setVisibility( FloatingActionButton.INVISIBLE );
+
+                // Announce!
+                Toast.makeText( getApplicationContext(), "Floor Plan Debug Mode Disabled", Toast.LENGTH_SHORT ).show();
+            }
+        } );
+
+        // Set this button to select the next floor Plan
+        FPSelectFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                if( curFloorPlanSet == null )
+                {
+                    curFloorPlanSet = floorPlansHM.entrySet();
+                }
+
+                // FOLLOW EXAMPLE
+            }
+        } );
     }
 
     // Init Drawer
@@ -775,8 +838,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d( "UCDetailedMaps", "Resource String is: " + tmpStringBuild.toString() );
                 GroundOverlayOptions tmpOverlay = new GroundOverlayOptions()
                         .image( BitmapDescriptorFactory.fromResource( resID ) )
-                        .position( fp.cornerLatLng, fp.scale );
-                mMap.addGroundOverlay( tmpOverlay );
+                        .position( fp.latLng, fp.scale );
+                fp.groundMapRef = mMap.addGroundOverlay( tmpOverlay );
             }
         }
 
