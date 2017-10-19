@@ -110,6 +110,72 @@
             android:inputType="textNoSuggestions"/>
         android:hint="LanLng Name" />
 
+        <!-- Button that enables Floor plan debug mode -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/FPFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/debugFAB"
+            android:layout_alignParentRight="true"
+            app:fabSize="mini"
+            app:srcCompat="@android:drawable/ic_dialog_map" />
+
+        <!-- Button that disables Floor plan debug mode -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/FPDisableFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/FPFAB"
+            android:layout_alignParentRight="true"
+            app:fabSize="mini"
+            app:srcCompat="@android:drawable/ic_lock_power_off" />
+
+        <!-- Down Button -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/FPDownFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            app:fabSize="mini" />
+
+        <!-- Left Button -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/FPLeftFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/FPDownFAB"
+            android:layout_toLeftOf="@+id/FPDownFAB"
+            app:fabSize="mini" />ght
+
+        <!-- Right Button -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/FPRightFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/FPDownFAB"
+            android:layout_toRightOf="@+id/FPDownFAB"
+            app:fabSize="mini" />
+
+        <!-- Up Button -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/FPUpFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/FPRightFAB"
+            android:layout_toRightOf="@+id/FPRightFAB"
+            app:fabSize="mini" />
+
+        <!-- Left Button -->
+        <!-- <android.support.design.widget.FloatingActionButton
+            android:id="@+id/FPDownFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            app:fabSize="mini"
+            app:srcCompat="@android:drawable/ic_lock_power_off" /> -->
+
     </RelativeLayout>
     <!-- The navigation drawer -->
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

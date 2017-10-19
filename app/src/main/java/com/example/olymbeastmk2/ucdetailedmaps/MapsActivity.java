@@ -274,6 +274,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final FloatingActionButton debugSaveToClipboard = ( FloatingActionButton ) findViewById( R.id.debugSaveToClipboardFAB );
         final FloatingActionButton debugToggleBuildings = ( FloatingActionButton ) findViewById( R.id.debugToggleBuildingsFAB );
 
+        final FloatingActionButton FPFAB = ( FloatingActionButton ) findViewById( R.id.FPFAB );
+        final FloatingActionButton FPDisableFAB = ( FloatingActionButton ) findViewById( R.id.FPDisableFAB );
+        final FloatingActionButton FPDownFAB = ( FloatingActionButton ) findViewById( R.id.FPDownFAB );
+        final FloatingActionButton FPLeftFAB = ( FloatingActionButton ) findViewById( R.id.FPLeftFAB );
+        final FloatingActioNButton FPRight
+
         // Text field for inputting a label for the LatLng
         final EditText debugEntryField = ( EditText ) findViewById( R.id.debugEntryField );
 
@@ -518,6 +524,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         } );
+
+        // Set this button to enable Floor Plans mode
+
     }
 
     // Init Drawer
