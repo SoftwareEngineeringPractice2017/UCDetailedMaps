@@ -766,7 +766,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d( "UCDetailedMaps", "Resource String is: " + tmpStringBuild.toString() );
                 GroundOverlayOptions tmpOverlay = new GroundOverlayOptions()
                         .image( BitmapDescriptorFactory.fromResource( resID ) )
-                        .position( fp.cornerLatLng, 150f );
+                        .position( fp.cornerLatLng, 100f );
                 mMap.addGroundOverlay( tmpOverlay );
             }
         }
