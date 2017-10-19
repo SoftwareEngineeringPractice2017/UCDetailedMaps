@@ -16,11 +16,13 @@ public class FloorPlan
     public LatLng cornerLatLng;
     public double rotationDegrees;
     public String floor;
+    public float scale;
 
-    public FloorPlan( LatLng cll, double rD, String f )
+    public FloorPlan( LatLng cll, double rD, String f, float s )
     {
         cornerLatLng = cll;
         rotationDegrees = rD;
         floor = f;
+        scale = s;
     }
 }

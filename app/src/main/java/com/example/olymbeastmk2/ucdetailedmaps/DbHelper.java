@@ -66,6 +66,7 @@ public class DbHelper extends SQLiteOpenHelper
     public static final String PLANS_ROT = "rot";
     public static final String PLANS_BUILDING_FK = "buildfkey";
     public static final String PLANS_NAME = "name";
+    public static final String PLANS_SCALE = "scale";
 
     public DbHelper( Context context, String name, SQLiteDatabase.CursorFactory factory, int version )
     {
@@ -142,6 +143,7 @@ public class DbHelper extends SQLiteOpenHelper
                 PLANS_LAT + " double, " +
                 PLANS_LNG + " double, " +
                 PLANS_ROT + " double, " +
+                PLANS_SCALE + " float, " +
                 "FOREIGN KEY (" + PLANS_BUILDING_FK + ") REFERENCES " + BUILDING_TABLE + "(" + BUILDING_ID + "));" );
     }
 
@@ -359,7 +361,7 @@ public class DbHelper extends SQLiteOpenHelper
 
             Log.d( "UCDetailedMaps", "NOW LOADING PLAN DATA" );
 
-            final int NUMSEP = 4;
+            final int NUMSEP = 5;
 
             while( ( line = buffer.readLine() ) != null )
             {
@@ -414,6 +416,7 @@ public class DbHelper extends SQLiteOpenHelper
                     contentValuesNext.put( PLANS_LAT, Double.parseDouble( tmpString[ i + 1 ] ) );
                     contentValuesNext.put( PLANS_LNG, Double.parseDouble( tmpString[ i + 2 ] ) );
                     contentValuesNext.put( PLANS_ROT, Double.parseDouble( tmpString[ i + 3 ] ) );
+                    contentValuesNext.put( PLANS_SCALE, Float.parseFloat( tmpString[ i + 4 ] ) );
                     contentValuesNext.put( PLANS_BUILDING_FK, curBuildID );
                     db.insert( PLANS_TABLE, null, contentValuesNext );
                 }
@@ -607,8 +610,9 @@ public class DbHelper extends SQLiteOpenHelper
                     double tmpLng = relPlanRes.getDouble( relPlanRes.getColumnIndex( PLANS_LNG ) );
                     double tmpRot = relPlanRes.getDouble( relPlanRes.getColumnIndex( PLANS_ROT ) );
                     String tmpFloor = relPlanRes.getString( relPlanRes.getColumnIndex( PLANS_NAME ) );
+                    float tmpScale = relPlanRes.getFloat( relPlanRes.getColumnIndex( PLANS_SCALE ) );
 
-                    FloorPlan tmpFloorPlan = new FloorPlan( new LatLng( tmpLat, tmpLng ), tmpRot, tmpFloor );
+                    FloorPlan tmpFloorPlan = new FloorPlan( new LatLng( tmpLat, tmpLng ), tmpRot, tmpFloor, tmpScale );
 
                     // Store floor in array
                     tmpFloorPlanArr.add( tmpFloorPlan );
