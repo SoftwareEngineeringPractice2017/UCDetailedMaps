@@ -23,30 +23,22 @@ public class MenuHandler {
     public void populate(ArrayList< Building > _buildings, HashMap< String, ArrayList< Icon > > _icons)
     {
         //ArrayList to be loaded and returned.
-        ArrayList< MenuItem > iconOutput = new ArrayList< MenuItem >();
-        ArrayList< MenuItem > buildingOutput = new ArrayList< MenuItem >();
+        ArrayList< MenuItem > output = new ArrayList< MenuItem >();
 
         //Each key in icons represents an IconType.
         //Cycle through each IconType and add each as a new MenuItem.
         for( String s : _icons.keySet() )
         {
-            iconOutput.add( new MenuItem( s ) );
+            output.add( new MenuItem( s ) );
         }
-
-        //Sort output alphabetically.
-        Collections.sort( iconOutput );
 
         //Add each building name as a MenuItem.
         for( Building b : _buildings )
         {
-            buildingOutput.add( new MenuItem( b.getID(), b.getName() ) );
+            output.add( new MenuItem( b.getID(), b.getName() ) );
         }
 
-        Collections.sort( buildingOutput );
-
-        ArrayList< MenuItem > output = new ArrayList< MenuItem >();
-        output.addAll(iconOutput);
-        output.addAll(buildingOutput);
+        Collections.sort(output);
 
         int location = 0;
         for(MenuItem m : output)
@@ -58,6 +50,42 @@ public class MenuHandler {
         menuItems = output;
         currentMenu = menuItems;
     }
+
+//    //ArrayList to be loaded and returned.
+//    ArrayList< MenuItem > iconOutput = new ArrayList< MenuItem >();
+//    ArrayList< MenuItem > buildingOutput = new ArrayList< MenuItem >();
+//
+//    //Each key in icons represents an IconType.
+//    //Cycle through each IconType and add each as a new MenuItem.
+//        for( String s : _icons.keySet() )
+//    {
+//        iconOutput.add( new MenuItem( s ) );
+//    }
+//
+//    //Sort output alphabetically.
+//        Collections.sort( iconOutput );
+//
+//    //Add each building name as a MenuItem.
+//        for( Building b : _buildings )
+//    {
+//        buildingOutput.add( new MenuItem( b.getID(), b.getName() ) );
+//    }
+//
+//        Collections.sort( buildingOutput );
+//
+//    ArrayList< MenuItem > output = new ArrayList< MenuItem >();
+//        output.addAll(iconOutput);
+//        output.addAll(buildingOutput);
+//
+//    int location = 0;
+//        for(MenuItem m : output)
+//    {
+//        m.location = location++;
+//        m.checked = location % 2 == 0;
+//    }
+//
+//    menuItems = output;
+//    currentMenu = menuItems;
 
     public void filter(String filter )
     {
