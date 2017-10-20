@@ -210,6 +210,7 @@ public class DbHelper extends SQLiteOpenHelper
             boolean tripleHashHit = false;
             boolean tripleMoneyHit = false;
             boolean tripleAtHit = false;
+            boolean tripleExclamationHit = false;
 
             // 'Read in' one line to skip it as the first line is just titles for the fields
             buffer.readLine();
@@ -382,6 +383,17 @@ public class DbHelper extends SQLiteOpenHelper
 
             while( ( line = buffer.readLine() ) != null )
             {
+                // This will check for denoting string '!!!', which indicates that Room Data will be read in
+                if( line.startsWith( "!!!" ) )
+                {
+                    // Flip associated boolean to indicate that we have passed '!!!'
+                    tripleExclamationHit = true;
+
+                    // Break the loop as we are done loading in plan data.
+                    break;
+                }
+
+
                 // Remove Trailing Commas
                 line = RemoveTrailingCommas( line );
 
@@ -436,6 +448,57 @@ public class DbHelper extends SQLiteOpenHelper
                     contentValuesNext.put( PLANS_BUILDING_FK, curBuildID );
                     db.insert( PLANS_TABLE, null, contentValuesNext );
                 }
+            }
+
+            if( !tripleExclamationHit )
+            {
+                Log.e( "UCDetailedMaps", "!!! was NOT found after plan data, aborting loading process");
+                return false;
+            }
+
+
+            HashMap<String, Integer> buildingIDs = new HashMap< >();
+            ArrayList<Building> buildings = GetBuildings();
+            for(Building b : buildings)
+            {
+                buildingIDs.put(b.getName(), b.getID());
+            }
+
+
+            while( ( line = buffer.readLine() ) != null )
+            {
+                // Remove Trailing Commas
+                line = RemoveTrailingCommas( line );
+
+                Log.d( "UCDetailedMaps", line );
+
+                // Temp string to hold seperated elements
+                String[] tmpString = line.split( "," );
+
+                // Create a contentValue to push to the Icon table in the database
+                ContentValues contentValues = new ContentValues();
+
+                // Read in ID and associated icon label
+
+                // Room format:
+                // [Building Name],[Floor Number],[Latitute],[Longitude],[Room Label]
+                // e.g. Building 22,0,-35.24061962194579,149.088053740561,A3
+
+                String building = tmpString[0];
+                if(!buildingIDs.containsKey(building))
+                {
+                    Log.e( "UCDetailedMaps", "No building was found with this name.");
+                    return false;
+                }
+
+                contentValues.put( ROOMS_BUILDING, buildingIDs.get(building) );
+                contentValues.put( ROOMS_FLOOR, tmpString[1] );
+                contentValues.put( ROOMS_LAT, tmpString[2] );
+                contentValues.put( ROOMS_LNG, tmpString[3] );
+                contentValues.put( ROOMS_TITLE, tmpString[4] );
+
+                db.insert(ICONS_TABLE, null, contentValues);
+
             }
         }
         catch( IOException exception )
