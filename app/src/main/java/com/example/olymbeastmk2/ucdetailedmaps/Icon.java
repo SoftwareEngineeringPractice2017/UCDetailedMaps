@@ -115,13 +115,18 @@ public class Icon
     {
         Bitmap iconBitmap = parent.GetIconTypeBitmap( getType() );
 
-        MarkerOptions mkrOptPass = new MarkerOptions().position( getLocation() );
+        MarkerOptions mkrOptPass = new MarkerOptions().position( getLocation() ).title(getType());
         mkrOptPass.icon( BitmapDescriptorFactory.fromBitmap( parent.GetIconTypeBitmap( getType() ) ) );
 
         marker = mMap.addMarker( mkrOptPass );
 
         // Indicate that this icon is on the map.
         hasBeenAddedToMap = true;
+    }
+
+    public void showTitle()
+    {
+        marker.showInfoWindow();
     }
 
 

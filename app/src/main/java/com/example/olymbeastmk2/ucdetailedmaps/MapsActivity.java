@@ -653,6 +653,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             location = icon.getLocation();
+            icon.showTitle();
 
             Toast toast = Toast.makeText(getApplicationContext(), "Closest " + icon.getType(), Toast.LENGTH_SHORT);
             toast.show();
