@@ -169,7 +169,7 @@ public class DbHelper extends SQLiteOpenHelper
     {
         while(line.endsWith(","))
         {
-            line = line.substring(0, line.length() - 2);
+            line = line.substring(0, line.length() - 1);
         }
 
         return line;
@@ -203,6 +203,7 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL( "delete from " + ICONS_TABLE );
         db.execSQL( "delete from " + ICONTYPES_TABLE );
         db.execSQL( "delete from " + PLANS_TABLE );
+        db.execSQL( "delete from " + ROOMS_TABLE );
 
         try
         {
@@ -456,6 +457,8 @@ public class DbHelper extends SQLiteOpenHelper
                 return false;
             }
 
+            Log.d( "UCDetailedMaps", "NOW LOADING ROOM DATA" );
+
 
             HashMap<String, Integer> buildingIDs = new HashMap< >();
             ArrayList<Building> buildings = GetBuildings();
@@ -497,7 +500,7 @@ public class DbHelper extends SQLiteOpenHelper
                 contentValues.put( ROOMS_LNG, tmpString[3] );
                 contentValues.put( ROOMS_TITLE, tmpString[4] );
 
-                db.insert(ICONS_TABLE, null, contentValues);
+                db.insert(ROOMS_TABLE, null, contentValues);
 
             }
         }

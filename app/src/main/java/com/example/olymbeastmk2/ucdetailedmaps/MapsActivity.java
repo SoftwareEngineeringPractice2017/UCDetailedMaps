@@ -823,6 +823,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
 
+
+
         // Set up listener to hide or show buildings
         mMap.setOnCameraMoveListener( new GoogleMap.OnCameraMoveListener()
         {
@@ -832,11 +834,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 CameraPosition cameraPosition = mMap.getCameraPosition();
                 if( cameraPosition.zoom > 19.0 )
                 {
-                    // Loop through all the Building Polygons, making them invisible
-                    for( Building b : buildings)
+//                    // Loop through all the Building Polygons, making them invisible
+//                    for( Building b : buildings)
+//                    {
+//                        b.polygon.setVisible( false );
+//                    }
+
+                    Building focusedBuilding = LatLngTools.findClosestBuilding(cameraPosition.target, buildings);
+
+                    if(!focusedBuilding.isFocused)
                     {
-                        b.polygon.setVisible( false );
+                        Log.d( "UCDetailedMaps", "Focused building changed. New target: " + focusedBuilding.getName());
+                        for( Building b : buildings)
+                        {
+                            b.polygon.setVisible( true );
+                            b.isFocused = false;
+                        }
+                        focusedBuilding.polygon.setVisible(false);
+                        focusedBuilding.isFocused = true;
+
+                        for (Building b : buildings)
+                        {
+                            if(b.getID() != focusedBuilding.getID())
+                            {
+                                b.hideRooms();
+                            }
+                        }
+                        focusedBuilding.showRooms(0, getApplicationContext(), mMap);
                     }
+
                 }
                 else
                 {
@@ -844,7 +870,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     for( Building b : buildings )
                     {
                         b.polygon.setVisible( true );
+                        b.isFocused = false;
+                        b.hideRooms();
                     }
+
+
                 }
             }
         });

@@ -1,12 +1,16 @@
 package com.example.olymbeastmk2.ucdetailedmaps;
 
+import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polygon;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 // HELLO RILEY, ITS GREG HERE. THE CODE IS 'PINEAPPLE' :P
 
@@ -35,6 +39,8 @@ public class Building
 
     public Polygon polygon;
 
+    public boolean isFocused;
+
 
     public Building(int _id, DbHelper _parent)
     {
@@ -44,6 +50,9 @@ public class Building
         hasName = false;
         hasOutline = false;
         hasEntries = false;
+        hasRooms = false;
+
+        isFocused = false;
     }
 
     public void Load()
@@ -69,6 +78,7 @@ public class Building
         Cursor res = parent.getReadableDatabase().rawQuery("select * from " + DbHelper.BUILDING_TABLE + " where " + DbHelper.BUILDING_ID + "=" + Integer.toString( id ), null);
         res.moveToFirst();
         name = res.getString( res.getColumnIndex( DbHelper.BUILDING_NAME ) );
+        res.close();
         hasName = true;
         return name;
     }
@@ -93,6 +103,8 @@ public class Building
             res.moveToNext();
         }
 
+        res.close();
+
         hasOutline = true;
         return outline;
     }
@@ -115,6 +127,8 @@ public class Building
             entries.add(new LatLng( latitude, longitude ));
             res.moveToNext();
         }
+
+        res.close();
 
         hasEntries = true;
         return entries;
@@ -144,7 +158,35 @@ public class Building
             res.moveToNext();
         }
 
+        res.close();
+
+        rooms = output;
+        hasRooms = true;
         return output;
+    }
+
+    public void showRooms(int floor, Context context, GoogleMap map)
+    {
+        if(getRooms().containsKey(floor))
+        {
+            ArrayList<Room> rooms = getRooms().get(floor);
+
+            for(Room r : rooms)
+            {
+                r.showMarker(context, map);
+            }
+        }
+    }
+
+    public void hideRooms()
+    {
+        for( int floor : getRooms().keySet() )
+        {
+            for(Room r : getRooms().get(floor))
+            {
+                r.hideMarker();
+            }
+        }
     }
 
 }

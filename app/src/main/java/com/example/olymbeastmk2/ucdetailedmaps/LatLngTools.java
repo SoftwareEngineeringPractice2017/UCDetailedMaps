@@ -55,4 +55,22 @@ public class LatLngTools {
 
         return closest;
     }
+
+    public static Building findClosestBuilding(LatLng location, ArrayList<Building> buildings)
+    {
+        Building closest = buildings.get(0);
+        double distance = getDistance(location, getCenter(closest.getOutline()));
+
+        for(Building b : buildings)
+        {
+            double newDistance = getDistance(location, getCenter(b.getOutline()));
+            if(newDistance < distance)
+            {
+                closest = b;
+                distance = newDistance;
+            }
+        }
+
+        return closest;
+    }
 }
