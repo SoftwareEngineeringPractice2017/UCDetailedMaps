@@ -53,6 +53,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
@@ -729,6 +730,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap = googleMap;
 
+        googleMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( this, R.raw.mapstyle));
+
+
         // Check permissions for locations!
         if( checkPermissions() )
         {
@@ -739,10 +743,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMaxZoomPreference( 60 );
         mMap.setMinZoomPreference( 10 );
 
-        // Add a marker in UC Campus
-        LatLng Building22 = new LatLng( -35.240489, 149.088301 );
+//        // Add a marker in UC Campus
+//        LatLng Building22 = new LatLng( -35.240489, 149.088301 );
         LatLng UCBruceCampus = new LatLng( -35.238569, 149.086063 );
-        mMap.addMarker( new MarkerOptions().position( Building22 ).title( "Building 22" ) );
+//        mMap.addMarker( new MarkerOptions().position( Building22 ).title( "Building 22" ) );
 
         // Move camera to UC Bruce Campus and zoom in at a value of 16 ( up to 21 )
         float zoomLevel= 14;
