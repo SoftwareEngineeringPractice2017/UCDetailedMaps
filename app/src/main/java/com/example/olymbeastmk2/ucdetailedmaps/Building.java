@@ -5,6 +5,7 @@ import android.database.Cursor;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 // HELLO RILEY, ITS GREG HERE. THE CODE IS 'PINEAPPLE' :P
 
@@ -28,6 +29,10 @@ public class Building
     private ArrayList<LatLng> entries;
     private boolean hasEntries;
 
+    private HashMap<Integer, ArrayList<Room>> rooms;
+    private boolean hasRooms;
+
+
     public Building(int _id, DbHelper _parent)
     {
         id = _id;
@@ -43,6 +48,7 @@ public class Building
         getName();
         getOutline();
         getEntries();
+        getRooms();
     }
 
     public int getID()
@@ -110,4 +116,32 @@ public class Building
         hasEntries = true;
         return entries;
     }
+
+    public HashMap<Integer, ArrayList<Room>> getRooms()
+    {
+        if(hasRooms)
+        {
+            return rooms;
+        }
+        HashMap<Integer, ArrayList<Room>> output = new HashMap<Integer, ArrayList<Room>>();
+
+
+        Cursor res = parent.getReadableDatabase().rawQuery("select * from " + DbHelper.ROOMS_TABLE + " where " + DbHelper.ROOMS_BUILDING + "=" + Integer.toString( id ), null);
+        res.moveToFirst();
+
+        while(res.isAfterLast() == false)
+        {
+            int floor = res.getInt( res.getColumnIndex( DbHelper.ROOMS_FLOOR ) );
+            if(!output.containsKey(floor))
+            {
+                output.put(floor, new ArrayList<Room>());
+            }
+            output.get(floor).add(new Room(res.getInt( res.getColumnIndex( DbHelper.ROOMS_ID ) ), parent));
+
+            res.moveToNext();
+        }
+
+        return output;
+    }
+
 }
