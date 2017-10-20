@@ -67,6 +67,14 @@ public class DbHelper extends SQLiteOpenHelper
     public static final String PLANS_BUILDING_FK = "buildfkey";
     public static final String PLANS_NAME = "name";
 
+    public static final String ROOMS_TABLE = "rooms";
+    public static final String ROOMS_ID = "id";
+    public static final String ROOMS_BUILDING = "buildingid";
+    public static final String ROOMS_FLOOR = "floor";
+    public static final String ROOMS_LAT = "lat";
+    public static final String ROOMS_LNG = "lng";
+    public static final String ROOMS_TITLE = "title";
+
     public DbHelper( Context context, String name, SQLiteDatabase.CursorFactory factory, int version )
     {
         super( context, name, factory, version );
@@ -93,6 +101,7 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL( "drop table if exists " + ICONS_TABLE );
         db.execSQL( "drop table if exists " + ICONTYPES_TABLE );
         db.execSQL( "drop table if exists " + PLANS_TABLE );
+        db.execSQL( "drop table if exists " + ROOMS_TABLE );
     }
 
     public void BuildEverything()
@@ -143,6 +152,16 @@ public class DbHelper extends SQLiteOpenHelper
                 PLANS_LNG + " double, " +
                 PLANS_ROT + " double, " +
                 "FOREIGN KEY (" + PLANS_BUILDING_FK + ") REFERENCES " + BUILDING_TABLE + "(" + BUILDING_ID + "));" );
+
+        // Create Rooms table
+        db.execSQL( "create table " + ROOMS_TABLE + "(" +
+                ROOMS_ID + " integer primary key autoincrement, " +
+                ROOMS_BUILDING + " integer, " +
+                ROOMS_FLOOR + " integer, " +
+                ROOMS_LAT + " double, " +
+                ROOMS_LNG + " double, " +
+                ROOMS_TITLE + " text, " +
+                "FOREIGN KEY (" + ROOMS_BUILDING + ") REFERENCES " + BUILDING_TABLE + "(" + BUILDING_ID + "));" );
     }
 
     // Removes trailing commas in a line and returns the final string
