@@ -634,6 +634,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if( b.getID() == menuItem.id )
                 {
                     location = LatLngTools.getCenter( b.getOutline() );
+                    Toast toast = Toast.makeText(getApplicationContext(), b.getName(), Toast.LENGTH_SHORT);
+                    toast.show();
                 }
             }
         }
@@ -651,6 +653,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             location = icon.getLocation();
+
+            Toast toast = Toast.makeText(getApplicationContext(), "Closest " + icon.getType(), Toast.LENGTH_SHORT);
+            toast.show();
         }
 
         mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( location, zoomLevel ) );
@@ -747,6 +752,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        LatLng Building22 = new LatLng( -35.240489, 149.088301 );
         LatLng UCBruceCampus = new LatLng( -35.238569, 149.086063 );
 //        mMap.addMarker( new MarkerOptions().position( Building22 ).title( "Building 22" ) );
+
+
+
 
         // Move camera to UC Bruce Campus and zoom in at a value of 16 ( up to 21 )
         float zoomLevel= 14;
