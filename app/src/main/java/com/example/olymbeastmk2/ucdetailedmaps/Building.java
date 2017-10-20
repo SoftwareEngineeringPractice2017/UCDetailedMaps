@@ -3,6 +3,7 @@ package com.example.olymbeastmk2.ucdetailedmaps;
 import android.database.Cursor;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polygon;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +32,8 @@ public class Building
 
     private HashMap<Integer, ArrayList<Room>> rooms;
     private boolean hasRooms;
+
+    public Polygon polygon;
 
 
     public Building(int _id, DbHelper _parent)

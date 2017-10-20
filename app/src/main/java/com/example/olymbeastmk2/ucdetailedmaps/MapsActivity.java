@@ -99,7 +99,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     // Polygon Array for buildings for future use
-    ArrayList<Polygon> polyBuildArr = new ArrayList<Polygon>();
+    //ArrayList<Polygon> polyBuildArr = new ArrayList<Polygon>();
+    // Commented out, Polygons are now kept in the Building class. - Riley
 
     // Floor Plans Array
     HashMap<String, ArrayList<FloorPlan>> floorPlansHM;
@@ -492,9 +493,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if( showBuildings )
                 {
                     // Loop through all the Building Polygons, making them invisible
-                    for( Polygon p : polyBuildArr )
+                    for( Building b : buildings )
                     {
-                        p.setVisible( false );
+                        b.polygon.setVisible( false );
                     }
 
                     // Print a toast to success!
@@ -506,9 +507,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 else
                 {
                     // Loop through each element in Polygon array and show them!
-                    for( Polygon p : polyBuildArr )
+                    for( Building b : buildings )
                     {
-                        p.setVisible( true );
+                        b.polygon.setVisible( true );
                     }
 
                     // Print a toast to success!
@@ -799,10 +800,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             PolygonOptions bOptions = new PolygonOptions().addAll( latLngArr ).fillColor( 0xFFFFFFFF );
 
             // Add the Polygon to Google maps
-            Polygon bPoly = mMap.addPolygon( bOptions );
+            // Store the polygon on the building, for future manipulation.
+            b.polygon = mMap.addPolygon( bOptions );
 
             // Add this to the Building Polygon Array for Future Use
-            polyBuildArr.add( bPoly );
+            // polyBuildArr.add( bPoly );
         }
 
         for(String s : icons.keySet())
@@ -831,17 +833,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if( cameraPosition.zoom > 19.0 )
                 {
                     // Loop through all the Building Polygons, making them invisible
-                    for( Polygon p : polyBuildArr )
+                    for( Building b : buildings)
                     {
-                        p.setVisible( false );
+                        b.polygon.setVisible( false );
                     }
                 }
                 else
                 {
                     // Loop through all the Building Polygons, making them visible
-                    for( Polygon p : polyBuildArr )
+                    for( Building b : buildings )
                     {
-                        p.setVisible( true );
+                        b.polygon.setVisible( true );
                     }
                 }
             }
