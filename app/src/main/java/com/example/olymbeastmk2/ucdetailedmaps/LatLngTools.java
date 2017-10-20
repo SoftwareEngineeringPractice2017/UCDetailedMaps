@@ -1,5 +1,7 @@
 package com.example.olymbeastmk2.ucdetailedmaps;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -30,10 +32,10 @@ public class LatLngTools {
     //Pythagorean triangle.
     public static double getDistance(LatLng pointA, LatLng pointB)
     {
-        double a2 = Math.abs(pointA.latitude * pointA.latitude);
-        double b2 = Math.abs(pointB.longitude * pointB.longitude);
+        double a = Math.abs(pointA.latitude - pointB.latitude);
+        double b = Math.abs(pointA.longitude - pointB.longitude);
 
-        return Math.sqrt(a2 + b2);
+        return Math.sqrt((a * a) + (b * b));
     }
 
     public static Icon findClosestIcon(LatLng location, ArrayList<Icon> icons)

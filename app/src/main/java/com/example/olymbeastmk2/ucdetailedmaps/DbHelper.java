@@ -458,7 +458,6 @@ public class DbHelper extends SQLiteOpenHelper
 
         while(res.isAfterLast() == false)
         {
-            //Log.e( "UCDetailedMapsApp", res.getString(0) );
             output.add(new Building( res.getInt( res.getColumnIndex( BUILDING_ID ) ), this));
             res.moveToNext();
         }
