@@ -68,6 +68,14 @@ public class DbHelper extends SQLiteOpenHelper
     public static final String PLANS_NAME = "name";
     public static final String PLANS_SCALE = "scale";
 
+    public static final String ROOMS_TABLE = "rooms";
+    public static final String ROOMS_ID = "id";
+    public static final String ROOMS_BUILDING = "buildingid";
+    public static final String ROOMS_FLOOR = "floor";
+    public static final String ROOMS_LAT = "lat";
+    public static final String ROOMS_LNG = "lng";
+    public static final String ROOMS_TITLE = "title";
+
     public DbHelper( Context context, String name, SQLiteDatabase.CursorFactory factory, int version )
     {
         super( context, name, factory, version );
@@ -94,6 +102,7 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL( "drop table if exists " + ICONS_TABLE );
         db.execSQL( "drop table if exists " + ICONTYPES_TABLE );
         db.execSQL( "drop table if exists " + PLANS_TABLE );
+        db.execSQL( "drop table if exists " + ROOMS_TABLE );
     }
 
     public void BuildEverything()
@@ -145,6 +154,16 @@ public class DbHelper extends SQLiteOpenHelper
                 PLANS_ROT + " double, " +
                 PLANS_SCALE + " float, " +
                 "FOREIGN KEY (" + PLANS_BUILDING_FK + ") REFERENCES " + BUILDING_TABLE + "(" + BUILDING_ID + "));" );
+
+        // Create Rooms table
+        db.execSQL( "create table " + ROOMS_TABLE + "(" +
+                ROOMS_ID + " integer primary key autoincrement, " +
+                ROOMS_BUILDING + " integer, " +
+                ROOMS_FLOOR + " integer, " +
+                ROOMS_LAT + " double, " +
+                ROOMS_LNG + " double, " +
+                ROOMS_TITLE + " text, " +
+                "FOREIGN KEY (" + ROOMS_BUILDING + ") REFERENCES " + BUILDING_TABLE + "(" + BUILDING_ID + "));" );
     }
 
     // Removes trailing commas in a line and returns the final string
@@ -152,7 +171,7 @@ public class DbHelper extends SQLiteOpenHelper
     {
         while(line.endsWith(","))
         {
-            line = line.substring(0, line.length() - 2);
+            line = line.substring(0, line.length() - 1);
         }
 
         return line;
@@ -186,6 +205,7 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL( "delete from " + ICONS_TABLE );
         db.execSQL( "delete from " + ICONTYPES_TABLE );
         db.execSQL( "delete from " + PLANS_TABLE );
+        db.execSQL( "delete from " + ROOMS_TABLE );
 
         try
         {
@@ -193,6 +213,7 @@ public class DbHelper extends SQLiteOpenHelper
             boolean tripleHashHit = false;
             boolean tripleMoneyHit = false;
             boolean tripleAtHit = false;
+            boolean tripleExclamationHit = false;
 
             // 'Read in' one line to skip it as the first line is just titles for the fields
             buffer.readLine();
@@ -365,6 +386,17 @@ public class DbHelper extends SQLiteOpenHelper
 
             while( ( line = buffer.readLine() ) != null )
             {
+                // This will check for denoting string '!!!', which indicates that Room Data will be read in
+                if( line.startsWith( "!!!" ) )
+                {
+                    // Flip associated boolean to indicate that we have passed '!!!'
+                    tripleExclamationHit = true;
+
+                    // Break the loop as we are done loading in plan data.
+                    break;
+                }
+
+
                 // Remove Trailing Commas
                 line = RemoveTrailingCommas( line );
 
@@ -421,6 +453,59 @@ public class DbHelper extends SQLiteOpenHelper
                     db.insert( PLANS_TABLE, null, contentValuesNext );
                 }
             }
+
+            if( !tripleExclamationHit )
+            {
+                Log.e( "UCDetailedMaps", "!!! was NOT found after plan data, aborting loading process");
+                return false;
+            }
+
+            Log.d( "UCDetailedMaps", "NOW LOADING ROOM DATA" );
+
+
+            HashMap<String, Integer> buildingIDs = new HashMap< >();
+            ArrayList<Building> buildings = GetBuildings();
+            for(Building b : buildings)
+            {
+                buildingIDs.put(b.getName(), b.getID());
+            }
+
+
+            while( ( line = buffer.readLine() ) != null )
+            {
+                // Remove Trailing Commas
+                line = RemoveTrailingCommas( line );
+
+                Log.d( "UCDetailedMaps", line );
+
+                // Temp string to hold seperated elements
+                String[] tmpString = line.split( "," );
+
+                // Create a contentValue to push to the Icon table in the database
+                ContentValues contentValues = new ContentValues();
+
+                // Read in ID and associated icon label
+
+                // Room format:
+                // [Building Name],[Floor Number],[Latitute],[Longitude],[Room Label]
+                // e.g. Building 22,0,-35.24061962194579,149.088053740561,A3
+
+                String building = tmpString[0];
+                if(!buildingIDs.containsKey(building))
+                {
+                    Log.e( "UCDetailedMaps", "No building was found with this name.");
+                    return false;
+                }
+
+                contentValues.put( ROOMS_BUILDING, buildingIDs.get(building) );
+                contentValues.put( ROOMS_FLOOR, tmpString[1] );
+                contentValues.put( ROOMS_LAT, tmpString[2] );
+                contentValues.put( ROOMS_LNG, tmpString[3] );
+                contentValues.put( ROOMS_TITLE, tmpString[4] );
+
+                db.insert(ROOMS_TABLE, null, contentValues);
+
+            }
         }
         catch( IOException exception )
         {
@@ -442,7 +527,6 @@ public class DbHelper extends SQLiteOpenHelper
 
         while(res.isAfterLast() == false)
         {
-            //Log.e( "UCDetailedMapsApp", res.getString(0) );
             output.add(new Building( res.getInt( res.getColumnIndex( BUILDING_ID ) ), this));
             res.moveToNext();
         }

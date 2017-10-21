@@ -1,10 +1,16 @@
 package com.example.olymbeastmk2.ucdetailedmaps;
 
+import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polygon;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 // HELLO RILEY, ITS GREG HERE. THE CODE IS 'PINEAPPLE' :P
 
@@ -28,6 +34,14 @@ public class Building
     private ArrayList<LatLng> entries;
     private boolean hasEntries;
 
+    private HashMap<Integer, ArrayList<Room>> rooms;
+    private boolean hasRooms;
+
+    public Polygon polygon;
+
+    public boolean isFocused;
+
+
     public Building(int _id, DbHelper _parent)
     {
         id = _id;
@@ -36,6 +50,9 @@ public class Building
         hasName = false;
         hasOutline = false;
         hasEntries = false;
+        hasRooms = false;
+
+        isFocused = false;
     }
 
     public void Load()
@@ -43,6 +60,7 @@ public class Building
         getName();
         getOutline();
         getEntries();
+        getRooms();
     }
 
     public int getID()
@@ -60,6 +78,7 @@ public class Building
         Cursor res = parent.getReadableDatabase().rawQuery("select * from " + DbHelper.BUILDING_TABLE + " where " + DbHelper.BUILDING_ID + "=" + Integer.toString( id ), null);
         res.moveToFirst();
         name = res.getString( res.getColumnIndex( DbHelper.BUILDING_NAME ) );
+        res.close();
         hasName = true;
         return name;
     }
@@ -84,6 +103,8 @@ public class Building
             res.moveToNext();
         }
 
+        res.close();
+
         hasOutline = true;
         return outline;
     }
@@ -107,7 +128,65 @@ public class Building
             res.moveToNext();
         }
 
+        res.close();
+
         hasEntries = true;
         return entries;
     }
+
+    public HashMap<Integer, ArrayList<Room>> getRooms()
+    {
+        if(hasRooms)
+        {
+            return rooms;
+        }
+        HashMap<Integer, ArrayList<Room>> output = new HashMap<Integer, ArrayList<Room>>();
+
+
+        Cursor res = parent.getReadableDatabase().rawQuery("select * from " + DbHelper.ROOMS_TABLE + " where " + DbHelper.ROOMS_BUILDING + "=" + Integer.toString( id ), null);
+        res.moveToFirst();
+
+        while(res.isAfterLast() == false)
+        {
+            int floor = res.getInt( res.getColumnIndex( DbHelper.ROOMS_FLOOR ) );
+            if(!output.containsKey(floor))
+            {
+                output.put(floor, new ArrayList<Room>());
+            }
+            output.get(floor).add(new Room(res.getInt( res.getColumnIndex( DbHelper.ROOMS_ID ) ), parent));
+
+            res.moveToNext();
+        }
+
+        res.close();
+
+        rooms = output;
+        hasRooms = true;
+        return output;
+    }
+
+    public void showRooms(int floor, Context context, GoogleMap map)
+    {
+        if(getRooms().containsKey(floor))
+        {
+            ArrayList<Room> rooms = getRooms().get(floor);
+
+            for(Room r : rooms)
+            {
+                r.showMarker(context, map);
+            }
+        }
+    }
+
+    public void hideRooms()
+    {
+        for( int floor : getRooms().keySet() )
+        {
+            for(Room r : getRooms().get(floor))
+            {
+                r.hideMarker();
+            }
+        }
+    }
+
 }

@@ -53,6 +53,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
@@ -101,7 +102,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     // Polygon Array for buildings for future use
-    ArrayList<Polygon> polyBuildArr = new ArrayList<Polygon>();
+    //ArrayList<Polygon> polyBuildArr = new ArrayList<Polygon>();
+    // Commented out, Polygons are now kept in the Building class. - Riley
 
     // Floor Plans Array
     HashMap<String, ArrayList<FloorPlan>> floorPlansHM;
@@ -514,9 +516,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if( showBuildings )
                 {
                     // Loop through all the Building Polygons, making them invisible
-                    for( Polygon p : polyBuildArr )
+                    for( Building b : buildings )
                     {
-                        p.setVisible( false );
+                        b.polygon.setVisible( false );
                     }
 
                     // Print a toast to success!
@@ -528,9 +530,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 else
                 {
                     // Loop through each element in Polygon array and show them!
-                    for( Polygon p : polyBuildArr )
+                    for( Building b : buildings )
                     {
-                        p.setVisible( true );
+                        b.polygon.setVisible( true );
                     }
 
                     // Print a toast to success!
@@ -753,6 +755,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if( b.getID() == menuItem.id )
                 {
                     location = LatLngTools.getCenter( b.getOutline() );
+                    Toast toast = Toast.makeText(getApplicationContext(), b.getName(), Toast.LENGTH_SHORT);
+                    toast.show();
                 }
             }
         }
@@ -770,6 +774,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             location = icon.getLocation();
+            icon.showTitle();
+
+            Toast toast = Toast.makeText(getApplicationContext(), "Closest " + icon.getType(), Toast.LENGTH_SHORT);
+            toast.show();
         }
 
         mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( location, zoomLevel ) );
@@ -849,6 +857,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap = googleMap;
 
+        googleMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( this, R.raw.mapstyle));
+
+
         // Check permissions for locations!
         if( checkPermissions() )
         {
@@ -859,10 +870,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMaxZoomPreference( 60 );
         mMap.setMinZoomPreference( 10 );
 
-        // Add a marker in UC Campus
-        LatLng Building22 = new LatLng( -35.240489, 149.088301 );
+//        // Add a marker in UC Campus
+//        LatLng Building22 = new LatLng( -35.240489, 149.088301 );
         LatLng UCBruceCampus = new LatLng( -35.238569, 149.086063 );
-        mMap.addMarker( new MarkerOptions().position( Building22 ).title( "Building 22" ) );
+//        mMap.addMarker( new MarkerOptions().position( Building22 ).title( "Building 22" ) );
+
+
+
 
         // Move camera to UC Bruce Campus and zoom in at a value of 16 ( up to 21 )
         float zoomLevel= 14;
@@ -906,10 +920,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             PolygonOptions bOptions = new PolygonOptions().addAll( latLngArr ).fillColor( 0xFFFFFFFF );
 
             // Add the Polygon to Google maps
-            Polygon bPoly = mMap.addPolygon( bOptions );
+            // Store the polygon on the building, for future manipulation.
+            b.polygon = mMap.addPolygon( bOptions );
 
             // Add this to the Building Polygon Array for Future Use
-            polyBuildArr.add( bPoly );
+            // polyBuildArr.add( bPoly );
         }
 
         for(String s : icons.keySet())
@@ -928,6 +943,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
 
+
+
         // Set up listener to hide or show buildings
         mMap.setOnCameraMoveListener( new GoogleMap.OnCameraMoveListener()
         {
@@ -937,19 +954,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 CameraPosition cameraPosition = mMap.getCameraPosition();
                 if( cameraPosition.zoom > 19.0 )
                 {
-                    // Loop through all the Building Polygons, making them invisible
-                    for( Polygon p : polyBuildArr )
+//                    // Loop through all the Building Polygons, making them invisible
+//                    for( Building b : buildings)
+//                    {
+//                        b.polygon.setVisible( false );
+//                    }
+
+                    Building focusedBuilding = LatLngTools.findClosestBuilding(cameraPosition.target, buildings);
+
+                    if(!focusedBuilding.isFocused)
                     {
-                        p.setVisible( false );
+                        Log.d( "UCDetailedMaps", "Focused building changed. New target: " + focusedBuilding.getName());
+                        for( Building b : buildings)
+                        {
+                            b.polygon.setVisible( true );
+                            b.isFocused = false;
+                        }
+                        focusedBuilding.polygon.setVisible(false);
+                        focusedBuilding.isFocused = true;
+
+                        for (Building b : buildings)
+                        {
+                            if(b.getID() != focusedBuilding.getID())
+                            {
+                                b.hideRooms();
+                            }
+                        }
+                        focusedBuilding.showRooms(0, getApplicationContext(), mMap);
                     }
+
                 }
                 else
                 {
                     // Loop through all the Building Polygons, making them visible
-                    for( Polygon p : polyBuildArr )
+                    for( Building b : buildings )
                     {
-                        p.setVisible( true );
+                        b.polygon.setVisible( true );
+                        b.isFocused = false;
+                        b.hideRooms();
                     }
+
+
                 }
             }
         });

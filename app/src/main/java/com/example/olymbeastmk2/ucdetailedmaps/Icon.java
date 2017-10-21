@@ -64,12 +64,14 @@ public class Icon
         Cursor res = parent.getReadableDatabase().rawQuery("select * from " + DbHelper.ICONS_TABLE + " where " + DbHelper.ICONS_ID + "=" + Integer.toString( id ), null);
         res.moveToFirst();
         int typeID = res.getInt( res.getColumnIndex( DbHelper.ICONS_TYPE_ID ) );
+        res.close();
 
         //Use the TYPE_ID to get the ICONTYPES_NAME.
         Cursor res2 = parent.getReadableDatabase().rawQuery("select * from " + DbHelper.ICONTYPES_TABLE + " where " + DbHelper.ICONTYPES_ID + "=" + Integer.toString( typeID ), null);
         res2.moveToFirst();
 
         type = res2.getString(res2.getColumnIndex( DbHelper.ICONTYPES_NAME ) );
+        res2.close();
         hasType = true;
         return type;
     }
@@ -85,6 +87,7 @@ public class Icon
         res.moveToFirst();
 
         label = res.getString( res.getColumnIndex( DbHelper.ICONS_LABEL ) );
+        res.close();
         hasLabel = true;
         return label;
     }
@@ -115,13 +118,18 @@ public class Icon
     {
         Bitmap iconBitmap = parent.GetIconTypeBitmap( getType() );
 
-        MarkerOptions mkrOptPass = new MarkerOptions().position( getLocation() );
+        MarkerOptions mkrOptPass = new MarkerOptions().position( getLocation() ).title(getType());
         mkrOptPass.icon( BitmapDescriptorFactory.fromBitmap( parent.GetIconTypeBitmap( getType() ) ) );
 
         marker = mMap.addMarker( mkrOptPass );
 
         // Indicate that this icon is on the map.
         hasBeenAddedToMap = true;
+    }
+
+    public void showTitle()
+    {
+        marker.showInfoWindow();
     }
 
 
