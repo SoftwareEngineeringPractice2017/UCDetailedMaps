@@ -497,13 +497,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             for( FloorPlan fp : value )
             {
                 // Get full name of file
-                StringBuilder tmpStringBuild = new StringBuilder( "f" );
-                String[] tmpStringArr = key.split( " " );
-                tmpStringBuild.append( tmpStringArr[1] );
-                tmpStringBuild.append( fp.floor.toLowerCase() );
+                String fullFileName = fp.GetResourceString( key );
 
-                int resID = getResources().getIdentifier( tmpStringBuild.toString(), "drawable", getPackageName() );
-                Log.d( "UCDetailedMaps", "Resource String is: " + tmpStringBuild.toString() );
+                int resID = getResources().getIdentifier( fullFileName, "drawable", getPackageName() );
+                Log.d( "UCDetailedMaps", "Resource String is: " + fullFileName );
                 GroundOverlayOptions tmpOverlay = new GroundOverlayOptions()
                         .image( BitmapDescriptorFactory.fromResource( resID ) )
                         .position( fp.latLng, fp.scale );
@@ -566,7 +563,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                        b.polygon.setVisible( false );
 //                    }
 
-                    Building focusedBuilding = LatLngTools.findClosestBuilding(cameraPosition.target, buildings);
+                    /*Building focusedBuilding = LatLngTools.findClosestBuilding(cameraPosition.target, buildings);
 
                     if(!focusedBuilding.isFocused)
                     {
@@ -587,8 +584,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
                         }
                         focusedBuilding.showRooms(0, getApplicationContext(), mMap);
+                    }*/
+
+                    // Hide all previous rooms
+                    for( Building b : buildings )
+                    {
+                        b.hideRooms();
+                        b.polygon.setVisible( true );
                     }
 
+                    for( Building b : LatLngTools.findClosestBuildings( cameraPosition.target, buildings ) )
+                    {
+                        b.showFloorPlans();
+                        b.polygon.setVisible( false );
+                    }
                 }
                 else
                 {

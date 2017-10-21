@@ -65,7 +65,8 @@ public class DbHelper extends SQLiteOpenHelper
     public static final String PLANS_LNG = "lng";
     public static final String PLANS_ROT = "rot";
     public static final String PLANS_BUILDING_FK = "buildfkey";
-    public static final String PLANS_NAME = "name";
+    public static final String PLANS_FLOOR = "floor";
+    public static final String PLANS_FLOOR_NAME = "floorname";
     public static final String PLANS_SCALE = "scale";
 
     public static final String ROOMS_TABLE = "rooms";
@@ -148,7 +149,8 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL( "create table " + PLANS_TABLE + "(" +
                 PLANS_ID + " integer primary key autoincrement, " +
                 PLANS_BUILDING_FK + " integer, " +
-                PLANS_NAME + " text," +
+                PLANS_FLOOR + " integer," +
+                PLANS_FLOOR_NAME + " text," +
                 PLANS_LAT + " double, " +
                 PLANS_LNG + " double, " +
                 PLANS_ROT + " double, " +
@@ -382,7 +384,7 @@ public class DbHelper extends SQLiteOpenHelper
 
             Log.d( "UCDetailedMaps", "NOW LOADING PLAN DATA" );
 
-            final int NUMSEP = 5;
+            final int NUMSEP = 6;
 
             while( ( line = buffer.readLine() ) != null )
             {
@@ -444,11 +446,12 @@ public class DbHelper extends SQLiteOpenHelper
                 for( int i = 1; i < num; i += NUMSEP )
                 {
                     ContentValues contentValuesNext = new ContentValues();
-                    contentValuesNext.put( PLANS_NAME, tmpString[ i ] );
-                    contentValuesNext.put( PLANS_LAT, Double.parseDouble( tmpString[ i + 1 ] ) );
-                    contentValuesNext.put( PLANS_LNG, Double.parseDouble( tmpString[ i + 2 ] ) );
-                    contentValuesNext.put( PLANS_ROT, Double.parseDouble( tmpString[ i + 3 ] ) );
-                    contentValuesNext.put( PLANS_SCALE, Float.parseFloat( tmpString[ i + 4 ] ) );
+                    contentValuesNext.put( PLANS_FLOOR, Integer.parseInt( tmpString[ i ] ) );
+                    contentValuesNext.put( PLANS_FLOOR_NAME, tmpString[ i + 1 ] );
+                    contentValuesNext.put( PLANS_LAT, Double.parseDouble( tmpString[ i + 2 ] ) );
+                    contentValuesNext.put( PLANS_LNG, Double.parseDouble( tmpString[ i + 3 ] ) );
+                    contentValuesNext.put( PLANS_ROT, Double.parseDouble( tmpString[ i + 4 ] ) );
+                    contentValuesNext.put( PLANS_SCALE, Float.parseFloat( tmpString[ i + 5 ] ) );
                     contentValuesNext.put( PLANS_BUILDING_FK, curBuildID );
                     db.insert( PLANS_TABLE, null, contentValuesNext );
                 }
@@ -462,14 +465,12 @@ public class DbHelper extends SQLiteOpenHelper
 
             Log.d( "UCDetailedMaps", "NOW LOADING ROOM DATA" );
 
-
             HashMap<String, Integer> buildingIDs = new HashMap< >();
             ArrayList<Building> buildings = GetBuildings();
             for(Building b : buildings)
             {
                 buildingIDs.put(b.getName(), b.getID());
             }
-
 
             while( ( line = buffer.readLine() ) != null )
             {
@@ -693,10 +694,11 @@ public class DbHelper extends SQLiteOpenHelper
                     double tmpLat = relPlanRes.getDouble( relPlanRes.getColumnIndex( PLANS_LAT ) );
                     double tmpLng = relPlanRes.getDouble( relPlanRes.getColumnIndex( PLANS_LNG ) );
                     double tmpRot = relPlanRes.getDouble( relPlanRes.getColumnIndex( PLANS_ROT ) );
-                    String tmpFloor = relPlanRes.getString( relPlanRes.getColumnIndex( PLANS_NAME ) );
+                    int tmpFloor = relPlanRes.getInt( relPlanRes.getColumnIndex( PLANS_FLOOR ) );
+                    String tmpFloorName = relPlanRes.getString( relPlanRes.getColumnIndex( PLANS_FLOOR_NAME ) );
                     float tmpScale = relPlanRes.getFloat( relPlanRes.getColumnIndex( PLANS_SCALE ) );
 
-                    FloorPlan tmpFloorPlan = new FloorPlan( new LatLng( tmpLat, tmpLng ), tmpRot, tmpFloor, tmpScale );
+                    FloorPlan tmpFloorPlan = new FloorPlan( new LatLng( tmpLat, tmpLng ), tmpRot, tmpFloor, tmpFloorName, tmpScale );
 
                     // Store floor in array
                     tmpFloorPlanArr.add( tmpFloorPlan );

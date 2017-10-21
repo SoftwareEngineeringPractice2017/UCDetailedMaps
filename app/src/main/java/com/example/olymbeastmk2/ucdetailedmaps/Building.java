@@ -2,6 +2,7 @@ package com.example.olymbeastmk2.ucdetailedmaps;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -37,10 +38,12 @@ public class Building
     private HashMap<Integer, ArrayList<Room>> rooms;
     private boolean hasRooms;
 
+    private ArrayList<FloorPlan> floorPlans;
+    private boolean hasFloorPlans;
+
     public Polygon polygon;
 
     public boolean isFocused;
-
 
     public Building(int _id, DbHelper _parent)
     {
@@ -51,6 +54,7 @@ public class Building
         hasOutline = false;
         hasEntries = false;
         hasRooms = false;
+        hasFloorPlans = false;
 
         isFocused = false;
     }
@@ -142,7 +146,6 @@ public class Building
         }
         HashMap<Integer, ArrayList<Room>> output = new HashMap<Integer, ArrayList<Room>>();
 
-
         Cursor res = parent.getReadableDatabase().rawQuery("select * from " + DbHelper.ROOMS_TABLE + " where " + DbHelper.ROOMS_BUILDING + "=" + Integer.toString( id ), null);
         res.moveToFirst();
 
@@ -163,6 +166,38 @@ public class Building
         rooms = output;
         hasRooms = true;
         return output;
+    }
+
+    public ArrayList<FloorPlan> getFloorPlans()
+    {
+        if( hasFloorPlans )
+        {
+            return floorPlans;
+        }
+
+        ArrayList<FloorPlan> output = new ArrayList<FloorPlan>();
+
+        Cursor res = parent.getReadableDatabase().rawQuery( "select * from " + DbHelper.PLANS_TABLE + " where " + DbHelper.PLANS_BUILDING_FK + "=" + Integer.toString( id ), null );
+        res.moveToFirst();
+
+        while( res.isAfterLast() == false )
+        {
+            int floor = res.getInt( res.getColumnIndex( DbHelper.PLANS_FLOOR ) );
+
+            FloorPlan tmpPlan = new FloorPlan(
+                    new LatLng( res.getDouble( res.getColumnIndex( DbHelper.PLANS_LAT ) ), res.getDouble( res.getColumnIndex( DbHelper.PLANS_LNG ) ) ),
+                    res.getDouble( res.getColumnIndex( DbHelper.PLANS_ROT ) ),
+                    res.getInt( res.getColumnIndex( DbHelper.PLANS_FLOOR ) ),
+                    res.getString( res.getColumnIndex( DbHelper.PLANS_FLOOR_NAME ) ),
+                    res.getFloat( res.getColumnIndex( DbHelper.PLANS_SCALE ) ) );
+
+            output.add( tmpPlan );
+        }
+
+        floorPlans = output;
+        hasFloorPlans = true;
+        return output;
+
     }
 
     public void showRooms(int floor, Context context, GoogleMap map)
@@ -186,6 +221,22 @@ public class Building
             {
                 r.hideMarker();
             }
+        }
+    }
+
+    public void hideFloorPlans()
+    {
+        for( FloorPlan fp : getFloorPlans() )
+        {
+            fp.groundMapRef.setVisible( false );
+        }
+    }
+
+    public void showFloorPlans()
+    {
+        for( FloorPlan fp : getFloorPlans() )
+        {
+            fp.groundMapRef.setVisible( true );
         }
     }
 

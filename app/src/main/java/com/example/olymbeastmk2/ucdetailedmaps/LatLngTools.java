@@ -10,9 +10,13 @@ import java.util.ArrayList;
  * Created by Riley on 20/09/2017.
  */
 
-public class LatLngTools {
+public class LatLngTools
+{
+    // Radius for showing Buildings
+    final static double B_SHOW_RADIUS_VAL = 0.5;
+
     //Average the points together.
-    public  static LatLng getCenter(ArrayList<LatLng> polygon)
+    public static LatLng getCenter(ArrayList<LatLng> polygon)
     {
         double latitude = 0;
         double longitude = 0;
@@ -72,5 +76,21 @@ public class LatLngTools {
         }
 
         return closest;
+    }
+
+    public static ArrayList<Building> findClosestBuildings( LatLng location, ArrayList<Building> buildings )
+    {
+        ArrayList<Building> retBuildArr = new ArrayList<Building>();
+
+        for( Building b : buildings )
+        {
+            double curDist = getDistance( location, getCenter( b.getOutline() ) );
+            if( curDist < B_SHOW_RADIUS_VAL )
+            {
+                retBuildArr.add( b );
+            }
+        }
+
+        return retBuildArr;
     }
 }
