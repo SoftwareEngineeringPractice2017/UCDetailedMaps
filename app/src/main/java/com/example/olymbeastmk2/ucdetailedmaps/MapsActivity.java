@@ -108,7 +108,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // An Iterator will be used to loop through this set
     Set<HashMap.Entry<String, ArrayList<FloorPlan>>> curFloorPlanSet = null;
-    Iterator<HashMap<String, ArrayList<FloorPlan>>> cFIterator = null;
+    Iterator<HashMap.Entry<String, ArrayList<FloorPlan>>> cFIterator = null;
+
+    // Current Floor Plan and building for Debugging
+    FloorPlan curFloorPlan = null;
+    String curBuilding = null;
+
+    // Current Floor Plan Array num and the temp array
+    int floorPlanArrayInd = 0;
+    ArrayList<FloorPlan> floorPlanArr = null;
 
     //Database Stuff
     // A Handle to the applications resources
@@ -584,10 +592,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             {
                 if( curFloorPlanSet == null )
                 {
+                    // Initialize entry set and iterator
                     curFloorPlanSet = floorPlansHM.entrySet();
+                    cFIterator = curFloorPlanSet.iterator();
+
                 }
 
-                // FOLLOW EXAMPLE
+                // Check to see if the index has exceeded the arrays size
+                if( floorPlanArr != null )
+                {
+                    if( floorPlanArrayInd + 1 >= floorPlanArr.size() )
+                    {
+                        // See the floor plan index back to 0 and return
+                        floorPlanArrayInd = 0;
+                    }
+                }
+
+                // Check to see if we have started already reading the array
+                // ( And if we need to continue reading it
+                if( floorPlanArrayInd == 0 )
+                {
+                    if( !cFIterator.hasNext() )
+                    {
+                        // Reset Iterator
+                        cFIterator = curFloorPlanSet.iterator();
+                    }
+
+                    floorPlanArr = cFIterator.next().getValue();
+
+                    // Set the Current Floor plan
+                    curFloorPlan = floorPlanArr.get( floorPlanArrayInd );
+                    curBuilding = cFIterator.next().getKey();
+                }
+                // Continue Looping through array
+                else
+                {
+                    // Get next one
+                    curFloorPlan = floorPlanArr.get( floorPlanArrayInd );
+                }
+
+                // Print out the currently selected plan and building. Toast it!
+                Toast.makeText( getApplicationContext(), "Current Selection: " + curBuilding + " " + curFloorPlan.floor, Toast.LENGTH_LONG ).show();
+
+                // Inc.
+                floorPlanArrayInd++;
             }
         } );
     }
