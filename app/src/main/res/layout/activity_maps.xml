@@ -182,13 +182,33 @@
             app:srcCompat="@android:drawable/ic_media_next"
             app:fabSize="mini" />
 
+        <!-- Floor Plan Scale Decrease -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/FPScaleDecreaseFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:visibility="invisible"
+            app:fabSize="mini" />
+
+        <!-- Floor Plan Scale increase -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/FPScaleIncreaseFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/FPScaleDecreaseFAB"
+            android:layout_alignParentRight="true"
+            android:visibility="invisible"
+            app:fabSize="mini" />
+
         <!-- Floor Plan Coordinates Save -->
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/FPSaveClipFAB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
             android:visibility="invisible"
             app:srcCompat="@android:drawable/ic_menu_save"
             app:fabSize="mini" />
@@ -202,6 +222,13 @@
             android:layout_alignParentTop="true"
             android:visibility="invisible"/>
 
+        <!-- A textView to show the current scale -->
+        <TextView
+            android:id="@+id/FPScaleText"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_below="@id/FPBuildingFloorText"
+            android:visibility="invisible"/>
 
         <!-- Left Button -->
         <!-- <android.support.design.widget.FloatingActionButton

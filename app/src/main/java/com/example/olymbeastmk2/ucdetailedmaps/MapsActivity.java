@@ -55,6 +55,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -124,6 +125,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Move constant
     final double FP_MOVE_DIST = 0.000001;
+    final float FP_SCALE_VAL = 0.5f;
 
     //Database Stuff
     // A Handle to the applications resources
@@ -303,7 +305,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final FloatingActionButton FPRightFAB = ( FloatingActionButton ) findViewById( R.id.FPRightFAB );
         final FloatingActionButton FPUpFAB = ( FloatingActionButton ) findViewById( R.id.FPUpFAB );
         final FloatingActionButton FPSelectFAB = ( FloatingActionButton ) findViewById( R.id.FPSelectFAB );
+        final FloatingActionButton FPSaveClipFAB = ( FloatingActionButton ) findViewById( R.id.FPSaveClipFAB );
+        final FloatingActionButton FPScaleIncreaseFAB = ( FloatingActionButton ) findViewById( R.id.FPScaleIncreaseFAB );
+        final FloatingActionButton FPScaleDecreaseFAB = ( FloatingActionButton ) findViewById( R.id.FPScaleDecreaseFAB );
         final TextView FPBuildingFloorText = ( TextView ) findViewById( R.id.FPBuildingFloorText );
+        final TextView FPScaleText = ( TextView ) findViewById( R.id.FPScaleText );
 
         // Text field for inputting a label for the LatLng
         final EditText debugEntryField = ( EditText ) findViewById( R.id.debugEntryField );
@@ -565,8 +571,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 FPLeftFAB.setVisibility( FloatingActionButton.VISIBLE );
                 FPRightFAB.setVisibility( FloatingActionButton.VISIBLE );
                 FPSelectFAB.setVisibility( FloatingActionButton.VISIBLE );
+                FPSaveClipFAB.setVisibility( FloatingActionButton.VISIBLE );
+                FPScaleDecreaseFAB.setVisibility( FloatingActionButton.VISIBLE );
+                FPScaleIncreaseFAB.setVisibility( FloatingActionButton.VISIBLE );
 
                 FPBuildingFloorText.setVisibility( TextView.VISIBLE );
+                FPScaleText.setVisibility( TextView.VISIBLE );
 
                 // Announce!
                 Toast.makeText( getApplicationContext(), "Floor Plan Debug Mode Activated", Toast.LENGTH_SHORT ).show();
@@ -588,8 +598,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 FPLeftFAB.setVisibility( FloatingActionButton.INVISIBLE );
                 FPRightFAB.setVisibility( FloatingActionButton.INVISIBLE );
                 FPSelectFAB.setVisibility( FloatingActionButton.INVISIBLE );
+                FPSaveClipFAB.setVisibility( FloatingActionButton.INVISIBLE );
+                FPScaleDecreaseFAB.setVisibility( FloatingActionButton.INVISIBLE );
+                FPScaleIncreaseFAB.setVisibility( FloatingActionButton.INVISIBLE );
 
                 FPBuildingFloorText.setVisibility( TextView.INVISIBLE );
+                FPScaleText.setVisibility( TextView.INVISIBLE );
 
                 // Announce!
                 Toast.makeText( getApplicationContext(), "Floor Plan Debug Mode Disabled", Toast.LENGTH_SHORT ).show();
@@ -652,6 +666,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 // Set cur Building
                 FPBuildingFloorText.setText( curSelectString );
+
+                // Also set current Scale val
+                FPScaleText.setText( Float.toString( curFloorPlan.groundMapRef.getWidth() ) );
 
                 // Inc.
                 floorPlanArrayInd++;
@@ -739,6 +756,86 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     // Move it!
                     gRef.setPosition( new LatLng( curPos.latitude + FP_MOVE_DIST, curPos.longitude ) );
                 }
+            }
+        } );
+
+        // Set this button to increase scale for the current Floor Plan
+        FPScaleDecreaseFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                if( curFloorPlan == null )
+                {
+                    Toast.makeText( getApplicationContext(), "No Floor Plan Selected", Toast.LENGTH_LONG ).show();
+                }
+                else
+                {
+                    GroundOverlay gRef = curFloorPlan.groundMapRef;
+
+                    gRef.setDimensions( gRef.getWidth() - FP_SCALE_VAL );
+
+                    FPScaleText.setText( Float.toString( gRef.getWidth() ) );
+                }
+            }
+        } );
+
+        // Set this button to decrease scale for the current Floor Plan
+        FPScaleIncreaseFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                if( curFloorPlan == null )
+                {
+                    Toast.makeText( getApplicationContext(), "No Floor Plan Selected", Toast.LENGTH_LONG ).show();
+                }
+                else
+                {
+                    GroundOverlay gRef = curFloorPlan.groundMapRef;
+
+                    gRef.setDimensions( gRef.getWidth() + FP_SCALE_VAL );
+
+                    FPScaleText.setText( Float.toString( gRef.getWidth() ) );
+                }
+            }
+        } );
+
+
+        // Set this button to Save the LatLng and Scale to Clipboard
+        FPSaveClipFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                if( curFloorPlan == null )
+                {
+                    Toast.makeText( getApplicationContext(), "No Floor Plan Selected", Toast.LENGTH_LONG ).show();
+                }
+                else
+                {
+                    GroundOverlay gRef = curFloorPlan.groundMapRef;
+                    LatLng gLatLng = gRef.getPosition();
+
+                    StringBuilder stringToCopy = new StringBuilder( "" );
+                    stringToCopy.append( FPBuildingFloorText.getText().toString() );
+                    stringToCopy.append( ", " );
+                    stringToCopy.append( gLatLng.latitude );
+                    stringToCopy.append( ", " );
+                    stringToCopy.append( gLatLng.longitude );
+                    stringToCopy.append( ", " );
+                    stringToCopy.append( gRef.getWidth() );
+
+                    // Got info from here: https://stackoverflow.com/questions/19253786/how-to-copy-text-to-clip-board-in-android
+                    // This will copy the Location information and scale information of the floor plans to the ClipBoard
+                    ClipboardManager cb = ( ClipboardManager ) getSystemService( Context.CLIPBOARD_SERVICE );
+                    ClipData clip = ClipData.newPlainText( "Location information", stringToCopy.toString() );
+                    cb.setPrimaryClip( clip );
+
+                    Toast.makeText( getApplicationContext(), "FP info saved to Clipboard!", Toast.LENGTH_SHORT ).show();
+                }
+
+
             }
         } );
     }
@@ -976,9 +1073,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng UCBruceCampus = new LatLng( -35.238569, 149.086063 );
 //        mMap.addMarker( new MarkerOptions().position( Building22 ).title( "Building 22" ) );
 
-
-
-
         // Move camera to UC Bruce Campus and zoom in at a value of 16 ( up to 21 )
         float zoomLevel= 14;
         mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( UCBruceCampus, zoomLevel ) );
@@ -1094,8 +1188,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         b.isFocused = false;
                         b.hideRooms();
                     }
-
-
                 }
             }
         });
