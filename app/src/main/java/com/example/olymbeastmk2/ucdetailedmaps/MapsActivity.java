@@ -503,7 +503,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d( "UCDetailedMaps", "Resource String is: " + fullFileName );
                 GroundOverlayOptions tmpOverlay = new GroundOverlayOptions()
                         .image( BitmapDescriptorFactory.fromResource( resID ) )
-                        .position( fp.latLng, fp.scale );
+                        .position( fp.latLng, fp.scale )
+                        .visible( false );
                 fp.groundMapRef = mMap.addGroundOverlay( tmpOverlay );
             }
         }
@@ -562,41 +563,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                    {
 //                        b.polygon.setVisible( false );
 //                    }
+//
+//                    Building focusedBuilding = LatLngTools.findClosestBuilding(cameraPosition.target, buildings);
+//
+//                    if(!focusedBuilding.isFocused)
+//                    {
+//                        Log.d( "UCDetailedMaps", "Focused building changed. New target: " + focusedBuilding.getName());
+//                        for( Building b : buildings)
+//                        {
+//                            b.polygon.setVisible( true );
+//                            b.isFocused = false;
+//                        }
+//                        focusedBuilding.polygon.setVisible(false);
+//                        focusedBuilding.isFocused = true;
+//
+//                        for (Building b : buildings)
+//                        {
+//                            if(b.getID() != focusedBuilding.getID())
+//                            {
+//                                b.hideRooms();
+//                            }
+//                        }
+//                        focusedBuilding.showRooms(0, getApplicationContext(), mMap);
+//                    }
 
-                    /*Building focusedBuilding = LatLngTools.findClosestBuilding(cameraPosition.target, buildings);
-
-                    if(!focusedBuilding.isFocused)
-                    {
-                        Log.d( "UCDetailedMaps", "Focused building changed. New target: " + focusedBuilding.getName());
-                        for( Building b : buildings)
-                        {
-                            b.polygon.setVisible( true );
-                            b.isFocused = false;
-                        }
-                        focusedBuilding.polygon.setVisible(false);
-                        focusedBuilding.isFocused = true;
-
-                        for (Building b : buildings)
-                        {
-                            if(b.getID() != focusedBuilding.getID())
-                            {
-                                b.hideRooms();
-                            }
-                        }
-                        focusedBuilding.showRooms(0, getApplicationContext(), mMap);
-                    }*/
-
-                    // Hide all previous rooms
                     for( Building b : buildings )
                     {
                         b.hideRooms();
                         b.polygon.setVisible( true );
+                        b.isFocused = false;
                     }
 
-                    for( Building b : LatLngTools.findClosestBuildings( cameraPosition.target, buildings ) )
+                    ArrayList<Building> closestBuildings = LatLngTools.findClosestBuildings( cameraPosition.target, buildings );
+
+                    for( Building b : closestBuildings )
                     {
                         b.showFloorPlans();
                         b.polygon.setVisible( false );
+                        b.isFocused = true;
                     }
                 }
                 else
@@ -604,9 +608,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     // Loop through all the Building Polygons, making them visible
                     for( Building b : buildings )
                     {
-                        b.polygon.setVisible( true );
-                        b.isFocused = false;
-                        b.hideRooms();
+                        if( !b.isFocused )
+                        {
+                            b.polygon.setVisible( true );
+                            b.isFocused = false;
+                            b.hideRooms();
+                        }
                     }
                 }
             }

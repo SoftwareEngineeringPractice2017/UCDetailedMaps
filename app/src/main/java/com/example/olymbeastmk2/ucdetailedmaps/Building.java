@@ -192,7 +192,11 @@ public class Building
                     res.getFloat( res.getColumnIndex( DbHelper.PLANS_SCALE ) ) );
 
             output.add( tmpPlan );
+
+            res.moveToNext();
         }
+
+        res.close();
 
         floorPlans = output;
         hasFloorPlans = true;

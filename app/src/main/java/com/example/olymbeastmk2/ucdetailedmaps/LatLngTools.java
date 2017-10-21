@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class LatLngTools
 {
     // Radius for showing Buildings
-    final static double B_SHOW_RADIUS_VAL = 0.5;
+    final static double B_SHOW_RADIUS_VAL = 0.0001;
 
     //Average the points together.
     public static LatLng getCenter(ArrayList<LatLng> polygon)

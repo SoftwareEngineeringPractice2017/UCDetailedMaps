@@ -442,6 +442,8 @@ public class DbHelper extends SQLiteOpenHelper
                     curBuildID = cursor.getInt( cursor.getColumnIndex( BUILDING_ID ) );
                 }
 
+                cursor.close();
+
                 // Insert vals into DB!
                 for( int i = 1; i < num; i += NUMSEP )
                 {
@@ -531,6 +533,8 @@ public class DbHelper extends SQLiteOpenHelper
             output.add(new Building( res.getInt( res.getColumnIndex( BUILDING_ID ) ), this));
             res.moveToNext();
         }
+
+        res.close();
 
         return output;
     }
@@ -677,6 +681,8 @@ public class DbHelper extends SQLiteOpenHelper
             // Should be only one record, so we will get it directly from the database without any checks
             String buildName = tmpRes.getString( tmpRes.getColumnIndex( BUILDING_NAME ) );
 
+            tmpRes.close();
+
             // ---
 
             // Check to see if the key for this building exists
@@ -706,12 +712,16 @@ public class DbHelper extends SQLiteOpenHelper
                     relPlanRes.moveToNext();
                 }
 
+                relPlanRes.close();
+
                 // Add the temporary array to the HashMap with its associated Building String
                 retHashMap.put( buildName, tmpFloorPlanArr );
             }
 
             res.moveToNext();
         }
+
+        res.close();
 
         return retHashMap;
     }
