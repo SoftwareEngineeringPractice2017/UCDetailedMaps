@@ -182,6 +182,27 @@
             app:srcCompat="@android:drawable/ic_media_next"
             app:fabSize="mini" />
 
+        <!-- Floor Plan Coordinates Save -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/FPSaveClipFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            android:visibility="invisible"
+            app:srcCompat="@android:drawable/ic_menu_save"
+            app:fabSize="mini" />
+
+        <!-- A textView to show what Building is currently selected -->
+        <TextView
+            android:id="@+id/FPBuildingFloorText"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:visibility="invisible"/>
+
+
         <!-- Left Button -->
         <!-- <android.support.design.widget.FloatingActionButton
             android:id="@+id/FPDownFAB"

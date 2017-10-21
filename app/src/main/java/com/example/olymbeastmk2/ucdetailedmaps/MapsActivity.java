@@ -34,6 +34,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.graphics.BitmapFactory;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -51,6 +52,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -119,6 +121,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Current Floor Plan Array num and the temp array
     int floorPlanArrayInd = 0;
     ArrayList<FloorPlan> floorPlanArr = null;
+
+    // Move constant
+    final double FP_MOVE_DIST = 0.000001;
 
     //Database Stuff
     // A Handle to the applications resources
@@ -298,6 +303,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final FloatingActionButton FPRightFAB = ( FloatingActionButton ) findViewById( R.id.FPRightFAB );
         final FloatingActionButton FPUpFAB = ( FloatingActionButton ) findViewById( R.id.FPUpFAB );
         final FloatingActionButton FPSelectFAB = ( FloatingActionButton ) findViewById( R.id.FPSelectFAB );
+        final TextView FPBuildingFloorText = ( TextView ) findViewById( R.id.FPBuildingFloorText );
 
         // Text field for inputting a label for the LatLng
         final EditText debugEntryField = ( EditText ) findViewById( R.id.debugEntryField );
@@ -560,6 +566,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 FPRightFAB.setVisibility( FloatingActionButton.VISIBLE );
                 FPSelectFAB.setVisibility( FloatingActionButton.VISIBLE );
 
+                FPBuildingFloorText.setVisibility( TextView.VISIBLE );
+
                 // Announce!
                 Toast.makeText( getApplicationContext(), "Floor Plan Debug Mode Activated", Toast.LENGTH_SHORT ).show();
             }
@@ -581,6 +589,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 FPRightFAB.setVisibility( FloatingActionButton.INVISIBLE );
                 FPSelectFAB.setVisibility( FloatingActionButton.INVISIBLE );
 
+                FPBuildingFloorText.setVisibility( TextView.INVISIBLE );
+
                 // Announce!
                 Toast.makeText( getApplicationContext(), "Floor Plan Debug Mode Disabled", Toast.LENGTH_SHORT ).show();
             }
@@ -597,7 +607,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     // Initialize entry set and iterator
                     curFloorPlanSet = floorPlansHM.entrySet();
                     cFIterator = curFloorPlanSet.iterator();
-
                 }
 
                 // Check to see if the index has exceeded the arrays size
@@ -614,17 +623,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // ( And if we need to continue reading it
                 if( floorPlanArrayInd == 0 )
                 {
-                    if( cFIterator.hasNext() )
+                    if( !cFIterator.hasNext() )
                     {
-                        // Only get it ONCE
-                        HashMap.Entry<String, ArrayList<FloorPlan>> tmpEntry = cFIterator.next();
-
-                        floorPlanArr = tmpEntry.getValue();
-
-                        // Set the Current Floor plan
-                        curFloorPlan = floorPlanArr.get( floorPlanArrayInd );
-                        curBuilding = tmpEntry.getKey();
+                        // Reset
+                        cFIterator = curFloorPlanSet.iterator();
                     }
+
+                    // Only get it ONCE
+                    HashMap.Entry<String, ArrayList<FloorPlan>> tmpEntry = cFIterator.next();
+
+                    floorPlanArr = tmpEntry.getValue();
+
+                    // Set the Current Floor plan
+                    curFloorPlan = floorPlanArr.get( floorPlanArrayInd );
+                    curBuilding = tmpEntry.getKey();
                 }
                 // Continue Looping through array
                 else
@@ -633,11 +645,100 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     curFloorPlan = floorPlanArr.get( floorPlanArrayInd );
                 }
 
+                String curSelectString = curBuilding + " " + curFloorPlan.floor;
+
                 // Print out the currently selected plan and building. Toast it!
-                Toast.makeText( getApplicationContext(), "Current Selection: " + curBuilding + " " + curFloorPlan.floor, Toast.LENGTH_SHORT ).show();
+                // Toast.makeText( getApplicationContext(), curSelectString, Toast.LENGTH_SHORT ).show();
+
+                // Set cur Building
+                FPBuildingFloorText.setText( curSelectString );
 
                 // Inc.
                 floorPlanArrayInd++;
+            }
+        } );
+
+        // Set this button to move the Floor plan 'Up' ( Lng- )
+        FPUpFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                if( curFloorPlan == null )
+                {
+                    Toast.makeText( getApplicationContext(), "No Floor Plan Selected", Toast.LENGTH_LONG ).show();
+                }
+                else
+                {
+                    GroundOverlay gRef = curFloorPlan.groundMapRef;
+                    LatLng curPos = gRef.getPosition();
+
+                    // Move it!
+                    gRef.setPosition( new LatLng( curPos.latitude, curPos.longitude - FP_MOVE_DIST ) );
+                }
+            }
+        } );
+
+        // Set this button to move the Floor plan 'Down' ( Lng+ )
+        FPDownFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                if( curFloorPlan == null )
+                {
+                    Toast.makeText( getApplicationContext(), "No Floor Plan Selected", Toast.LENGTH_LONG ).show();
+                }
+                else
+                {
+                    GroundOverlay gRef = curFloorPlan.groundMapRef;
+                    LatLng curPos = gRef.getPosition();
+
+                    // Move it!
+                    gRef.setPosition( new LatLng( curPos.latitude, curPos.longitude + FP_MOVE_DIST ) );
+                }
+            }
+        } );
+
+        // Set this button to move the Floor plan 'Left' ( Lat- )
+        FPLeftFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                if( curFloorPlan == null )
+                {
+                    Toast.makeText( getApplicationContext(), "No Floor Plan Selected", Toast.LENGTH_LONG ).show();
+                }
+                else
+                {
+                    GroundOverlay gRef = curFloorPlan.groundMapRef;
+                    LatLng curPos = gRef.getPosition();
+
+                    // Move it!
+                    gRef.setPosition( new LatLng( curPos.latitude - FP_MOVE_DIST, curPos.longitude ) );
+                }
+            }
+        } );
+
+        // Set this button to move the Floor plan 'Right' ( Lat+ )
+        FPRightFAB.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View v )
+            {
+                if( curFloorPlan == null )
+                {
+                    Toast.makeText( getApplicationContext(), "No Floor Plan Selected", Toast.LENGTH_LONG ).show();
+                }
+                else
+                {
+                    GroundOverlay gRef = curFloorPlan.groundMapRef;
+                    LatLng curPos = gRef.getPosition();
+
+                    // Move it!
+                    gRef.setPosition( new LatLng( curPos.latitude + FP_MOVE_DIST, curPos.longitude ) );
+                }
             }
         } );
     }
