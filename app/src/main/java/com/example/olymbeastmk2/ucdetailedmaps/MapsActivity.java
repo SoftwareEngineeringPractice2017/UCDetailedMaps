@@ -612,17 +612,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // ( And if we need to continue reading it
                 if( floorPlanArrayInd == 0 )
                 {
-                    if( !cFIterator.hasNext() )
+                    if( cFIterator.hasNext() )
                     {
-                        // Reset Iterator
-                        cFIterator = curFloorPlanSet.iterator();
+                        // Only get it ONCE
+                        HashMap.Entry<String, ArrayList<FloorPlan>> tmpEntry = cFIterator.next();
+
+                        floorPlanArr = tmpEntry.getValue();
+
+                        // Set the Current Floor plan
+                        curFloorPlan = floorPlanArr.get( floorPlanArrayInd );
+                        curBuilding = tmpEntry.getKey();
                     }
-
-                    floorPlanArr = cFIterator.next().getValue();
-
-                    // Set the Current Floor plan
-                    curFloorPlan = floorPlanArr.get( floorPlanArrayInd );
-                    curBuilding = cFIterator.next().getKey();
                 }
                 // Continue Looping through array
                 else
@@ -632,7 +632,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 
                 // Print out the currently selected plan and building. Toast it!
-                Toast.makeText( getApplicationContext(), "Current Selection: " + curBuilding + " " + curFloorPlan.floor, Toast.LENGTH_LONG ).show();
+                Toast.makeText( getApplicationContext(), "Current Selection: " + curBuilding + " " + curFloorPlan.floor, Toast.LENGTH_SHORT ).show();
 
                 // Inc.
                 floorPlanArrayInd++;
