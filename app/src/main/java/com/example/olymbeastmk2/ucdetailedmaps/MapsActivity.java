@@ -95,9 +95,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //ArrayList<Polygon> polyBuildArr = new ArrayList<Polygon>();
     // Commented out, Polygons are now kept in the Building class. - Riley
 
-    // Floor Plans Array
-    HashMap<String, ArrayList<FloorPlan>> floorPlansHM;
-
     //Database Stuff
     // A Handle to the applications resources
     public Resources resources;
@@ -440,9 +437,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Fill Icons Dictionary
         icons = dbBuildHelp.GetIcons();
-
-        // Fill Floor plans hashmap
-        floorPlansHM = dbBuildHelp.GetPlans();
     }
 
     /**
@@ -467,7 +461,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLngDebug llDBG = new LatLngDebug( this, mMap, getApplicationContext(), buildings );
 
         // Set up Floor Plan Debug Menu
-        FloorPlanDebug fpDBG = new FloorPlanDebug( this, getApplicationContext(), floorPlansHM );
+        FloorPlanDebug fpDBG = new FloorPlanDebug( this, getApplicationContext(), buildings );
 
         // Check permissions for locations!
         if( checkPermissions() )
@@ -488,16 +482,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         float zoomLevel= 14;
         mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( UCBruceCampus, zoomLevel ) );
 
-        // Add floor plans
-        for( HashMap.Entry<String, ArrayList<FloorPlan>> entry : floorPlansHM.entrySet() )
-        {
-            String key = entry.getKey();
-            ArrayList<FloorPlan> value = entry.getValue();
 
-            for( FloorPlan fp : value )
+
+        for( Building b : buildings )
+        {
+            // Add floor plans
+            for( FloorPlan fp : b.getFloorPlans() )
             {
                 // Get full name of file
-                String fullFileName = fp.GetResourceString( key );
+                String fullFileName = fp.GetResourceString( b.getName() );
 
                 int resID = getResources().getIdentifier( fullFileName, "drawable", getPackageName() );
                 Log.d( "UCDetailedMaps", "Resource String is: " + fullFileName );
@@ -507,10 +500,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .visible( false );
                 fp.groundMapRef = mMap.addGroundOverlay( tmpOverlay );
             }
-        }
 
-        for( Building b : buildings )
-        {
             // Get the building's outline coordinates from the database
             ArrayList<LatLng> latLngArr = b.getOutline();
 

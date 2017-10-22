@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,22 +40,21 @@ public class FloorPlanDebug
     private TextView FPScaleText;
 
     // An Iterator will be used to loop through this set
-    Set<HashMap.Entry<String, ArrayList<FloorPlan>>> curFloorPlanSet = null;
-    Iterator<HashMap.Entry<String, ArrayList<FloorPlan>>> cFIterator = null;
-
-    // Current Floor Plan and building for Debugging
-    FloorPlan curFloorPlan = null;
-    String curBuilding = null;
+    Iterator<Building> bIt = null;
+    Iterator<FloorPlan> fIt = null;
 
     // Current Floor Plan Array num and the temp array
-    int floorPlanArrayInd = 0;
-    ArrayList<FloorPlan> floorPlanArr = null;
+    FloorPlan curFloorPlan = null;
+    Building curBuilding = null;
 
     // Move constant
     final double FP_MOVE_DIST = 0.000001;
     final float FP_SCALE_VAL = 0.5f;
 
-    public FloorPlanDebug( final Activity MapsActivity, final Context context, final HashMap<String, ArrayList<FloorPlan>> floorPlansHM )
+    // Bools
+    boolean floorPlansExist = true;
+
+    public FloorPlanDebug( final Activity MapsActivity, final Context context, final ArrayList<Building> buildings )
     {
         FPFAB = ( FloatingActionButton ) MapsActivity.findViewById( R.id.FPFAB );
         FPDisableFAB = ( FloatingActionButton ) MapsActivity.findViewById( R.id.FPDisableFAB );
@@ -71,6 +71,28 @@ public class FloorPlanDebug
         FPScaleText = ( TextView ) MapsActivity.findViewById( R.id.FPScaleText );
 
         debugFAB = ( FloatingActionButton ) MapsActivity.findViewById( R.id.debugFAB );
+
+        bIt = buildings.iterator();
+        curBuilding = bIt.next();
+
+        while( curBuilding.getFloorPlans().isEmpty() )
+        {
+            if( bIt.hasNext() )
+            {
+                curBuilding = bIt.next();
+            }
+            else
+            {
+                Log.e( "UCDetailedMaps", "There are no Floor Plans :(" );
+                floorPlansExist = false;
+            }
+        }
+
+        if( floorPlansExist )
+        {
+            fIt = curBuilding.getFloorPlans().iterator();
+            curFloorPlan = fIt.next();
+        }
 
         // Set this button to enable Floor Plans Debug Mode
         FPFAB.setOnClickListener( new View.OnClickListener()
@@ -132,62 +154,31 @@ public class FloorPlanDebug
             @Override
             public void onClick( View v )
             {
-                if( curFloorPlanSet == null )
-                {
-                    // Initialize entry set and iterator
-                    curFloorPlanSet = floorPlansHM.entrySet();
-                    cFIterator = curFloorPlanSet.iterator();
-                }
 
-                // Check to see if the index has exceeded the arrays size
-                if( floorPlanArr != null )
+                if( floorPlansExist )
                 {
-                    if( floorPlanArrayInd + 1 >= floorPlanArr.size() )
+                    if( fIt.hasNext() )
                     {
-                        // See the floor plan index back to 0 and return
-                        floorPlanArrayInd = 0;
+                        curFloorPlan = fIt.next();
+                    }
+                    else if( bIt.hasNext() )
+                    {
+                        curBuilding = bIt.next();
+                        fIt = curBuilding.getFloorPlans().iterator();
+                        curFloorPlan = fIt.next();
+                    }
+                    else
+                    {
+                        bIt = buildings.iterator();
+                        curBuilding = bIt.next();
+                        fIt = curBuilding.getFloorPlans().iterator();
+                        curFloorPlan = fIt.next();
                     }
                 }
-
-                // Check to see if we have started already reading the array
-                // ( And if we need to continue reading it
-                if( floorPlanArrayInd == 0 )
-                {
-                    if( !cFIterator.hasNext() )
-                    {
-                        // Reset
-                        cFIterator = curFloorPlanSet.iterator();
-                    }
-
-                    // Only get it ONCE
-                    HashMap.Entry<String, ArrayList<FloorPlan> > tmpEntry = cFIterator.next();
-
-                    floorPlanArr = tmpEntry.getValue();
-
-                    // Set the Current Floor plan
-                    curFloorPlan = floorPlanArr.get( floorPlanArrayInd );
-                    curBuilding = tmpEntry.getKey();
-                }
-                // Continue Looping through array
                 else
                 {
-                    // Get next one
-                    curFloorPlan = floorPlanArr.get( floorPlanArrayInd );
+                    Toast.makeText( context, "No Floor plans exist :(", Toast.LENGTH_SHORT ).show();
                 }
-
-                String curSelectString = curBuilding + " " + curFloorPlan.floor;
-
-                // Print out the currently selected plan and building. Toast it!
-                // Toast.makeText( context, curSelectString, Toast.LENGTH_SHORT ).show();
-
-                // Set cur Building
-                FPBuildingFloorText.setText( curSelectString );
-
-                // Also set current Scale val
-                FPScaleText.setText( Float.toString( curFloorPlan.groundMapRef.getWidth() ) );
-
-                // Inc.
-                floorPlanArrayInd++;
             }
         } );
 
