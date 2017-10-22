@@ -582,7 +582,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 else
                 {
-                    // Loop through all the Building Polygons, making them visible
+                    // Loop through all the Building Polygons, making them visible 
                     for( Building b : buildings )
                     {
                         b.hideFloorPlans();
