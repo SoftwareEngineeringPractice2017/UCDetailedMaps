@@ -500,7 +500,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 fp.groundMapRef = mMap.addGroundOverlay( tmpOverlay );
             }
 
-            b.hideFloorPlans();
+            // b.hideFloorPlans();
 
             // Get the building's outline coordinates from the database
             ArrayList<LatLng> latLngArr = b.getOutline();
@@ -538,8 +538,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
 
-
-
         // Set up listener to hide or show buildings
         mMap.setOnCameraMoveListener( new GoogleMap.OnCameraMoveListener()
         {
@@ -549,50 +547,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 CameraPosition cameraPosition = mMap.getCameraPosition();
                 if( cameraPosition.zoom > 19.0 )
                 {
-//                    // Loop through all the Building Polygons, making them invisible
-//                    for( Building b : buildings)
-//                    {
-//                        b.polygon.setVisible( false );
-//                    }
-//
-//                    Building focusedBuilding = LatLngTools.findClosestBuilding(cameraPosition.target, buildings);
-//
-//                    if(!focusedBuilding.isFocused)
-//                    {
-//                        Log.d( "UCDetailedMaps", "Focused building changed. New target: " + focusedBuilding.getName());
-//                        for( Building b : buildings)
-//                        {
-//                            b.polygon.setVisible( true );
-//                            b.isFocused = false;
-//                        }
-//                        focusedBuilding.polygon.setVisible(false);
-//                        focusedBuilding.isFocused = true;
-//
-//                        for (Building b : buildings)
-//                        {
-//                            if(b.getID() != focusedBuilding.getID())
-//                            {
-//                                b.hideRooms();
-//                            }
-//                        }
-//                        focusedBuilding.showRooms(0, getApplicationContext(), mMap);
-//                    }
-
+                    // Loop through all the Building Polygons, making them invisible
                     /*for( Building b : buildings )
                     {
-                        b.hideRooms();
-                        b.polygon.setVisible( true );
-                        b.isFocused = false;
+                        b.polygon.setVisible( false );
                     }*/
 
-                    ArrayList<Building> closestBuildings = LatLngTools.findClosestBuildings( cameraPosition.target, buildings );
+                    Building focusedBuilding = LatLngTools.findClosestBuilding(cameraPosition.target, buildings);
 
-                    for( Building b : closestBuildings )
+                    if(!focusedBuilding.isFocused)
                     {
-                        b.showFloorPlans();
-                        b.polygon.setVisible( false );
-                        b.isFocused = true;
-                        b.showRooms( 0, getApplicationContext(), mMap );
+                        Log.d( "UCDetailedMaps", "Focused building changed. New target: " + focusedBuilding.getName());
+                        for( Building b : buildings )
+                        {
+                            b.polygon.setVisible( true );
+                            // b.polygon.setZIndex( 1f );
+                            b.isFocused = false;
+                        }
+                        focusedBuilding.polygon.setVisible(false);
+                        focusedBuilding.isFocused = true;
+
+                        for (Building b : buildings)
+                        {
+                            if(b.getID() != focusedBuilding.getID())
+                            {
+                                b.hideRooms();
+                                b.hideFloorPlans();
+                            }
+                        }
+                        focusedBuilding.showRooms(0, getApplicationContext(), mMap);
+                        // focusedBuilding.pushOverFloorPlans();
+                        focusedBuilding.showFloorPlans();
                     }
                 }
                 else
@@ -602,6 +587,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     {
                         b.hideFloorPlans();
                         b.polygon.setVisible( true );
+                        // b.pullUnderFloorPlans();
                         b.isFocused = false;
                         b.hideRooms();
                     }

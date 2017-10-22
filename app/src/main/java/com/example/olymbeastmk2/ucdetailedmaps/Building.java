@@ -243,4 +243,19 @@ public class Building
         }
     }
 
+    public void pushOverFloorPlans()
+    {
+        for( FloorPlan fp : getFloorPlans() )
+        {
+            fp.groundMapRef.setZIndex( 2f );
+        }
+    }
+
+    public void pullUnderFloorPlans()
+    {
+        for( FloorPlan fp : getFloorPlans() )
+        {
+            fp.groundMapRef.setZIndex( 0f );
+        }
+    }
 }
