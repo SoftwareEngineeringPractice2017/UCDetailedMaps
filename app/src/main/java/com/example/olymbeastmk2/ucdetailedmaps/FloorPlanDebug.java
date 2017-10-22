@@ -164,6 +164,20 @@ public class FloorPlanDebug
                     else if( bIt.hasNext() )
                     {
                         curBuilding = bIt.next();
+
+                        while( curBuilding.getFloorPlans().isEmpty() )
+                        {
+                            if( bIt.hasNext() )
+                            {
+                                curBuilding = bIt.next();
+                            }
+                            else
+                            {
+                                bIt = buildings.iterator();
+                                curBuilding = bIt.next();
+                            }
+                        }
+
                         fIt = curBuilding.getFloorPlans().iterator();
                         curFloorPlan = fIt.next();
                     }
@@ -174,6 +188,9 @@ public class FloorPlanDebug
                         fIt = curBuilding.getFloorPlans().iterator();
                         curFloorPlan = fIt.next();
                     }
+
+                    FPScaleText.setText( Float.toString( curFloorPlan.scale ) );
+                    FPBuildingFloorText.setText( curBuilding.getName() + curFloorPlan.floorName );
                 }
                 else
                 {

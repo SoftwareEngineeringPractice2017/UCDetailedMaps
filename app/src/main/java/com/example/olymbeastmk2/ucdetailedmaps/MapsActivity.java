@@ -496,10 +496,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d( "UCDetailedMaps", "Resource String is: " + fullFileName );
                 GroundOverlayOptions tmpOverlay = new GroundOverlayOptions()
                         .image( BitmapDescriptorFactory.fromResource( resID ) )
-                        .position( fp.latLng, fp.scale )
-                        .visible( false );
+                        .position( fp.latLng, fp.scale );
                 fp.groundMapRef = mMap.addGroundOverlay( tmpOverlay );
             }
+
+            b.hideFloorPlans();
 
             // Get the building's outline coordinates from the database
             ArrayList<LatLng> latLngArr = b.getOutline();
@@ -577,12 +578,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                        focusedBuilding.showRooms(0, getApplicationContext(), mMap);
 //                    }
 
-                    for( Building b : buildings )
+                    /*for( Building b : buildings )
                     {
                         b.hideRooms();
                         b.polygon.setVisible( true );
                         b.isFocused = false;
-                    }
+                    }*/
 
                     ArrayList<Building> closestBuildings = LatLngTools.findClosestBuildings( cameraPosition.target, buildings );
 
@@ -591,6 +592,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         b.showFloorPlans();
                         b.polygon.setVisible( false );
                         b.isFocused = true;
+                        b.showRooms( 0, getApplicationContext(), mMap );
                     }
                 }
                 else
@@ -598,12 +600,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     // Loop through all the Building Polygons, making them visible
                     for( Building b : buildings )
                     {
-                        if( !b.isFocused )
-                        {
-                            b.polygon.setVisible( true );
-                            b.isFocused = false;
-                            b.hideRooms();
-                        }
+                        b.hideFloorPlans();
+                        b.polygon.setVisible( true );
+                        b.isFocused = false;
+                        b.hideRooms();
                     }
                 }
             }

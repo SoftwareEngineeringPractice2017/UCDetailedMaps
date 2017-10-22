@@ -201,7 +201,6 @@ public class Building
         floorPlans = output;
         hasFloorPlans = true;
         return output;
-
     }
 
     public void showRooms(int floor, Context context, GoogleMap map)
