@@ -1,20 +1,14 @@
 package com.example.olymbeastmk2.ucdetailedmaps;
 
-import android.app.DownloadManager;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Looper;
-import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -23,18 +17,13 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.graphics.BitmapFactory;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -42,37 +31,25 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
-import static android.R.attr.label;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 {
@@ -363,7 +340,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         }
-        else
+        else if (menuItem.type == MenuItem.ItemType.Icon)
         {
             Icon icon;
             if(myLocation != null)
@@ -382,8 +359,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Toast toast = Toast.makeText(getApplicationContext(), "Closest " + icon.getType(), Toast.LENGTH_SHORT);
             toast.show();
         }
+        else
+        {
+            location = menuItem.position;
+            zoomLevel = 23f;
+            floorController.floor = menuItem.floor;
+        }
 
         mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( location, zoomLevel ) );
+        updateBuildingFocus();
     }
 
 
@@ -439,6 +423,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Fill Icons Dictionary
         icons = dbBuildHelp.GetIcons();
+    }
+
+    private void updateBuildingFocus()
+    {
+        Building focusedBuilding = LatLngTools.findClosestBuilding(mMap.getCameraPosition().target, buildings);
+
+        if(!focusedBuilding.isFocused)
+        {
+            Log.d( "UCDetailedMaps", "Focused building changed. New target: " + focusedBuilding.getName());
+            for( Building b : buildings )
+            {
+                b.polygon.setVisible( true );
+                // b.polygon.setZIndex( 1f );
+                b.isFocused = false;
+            }
+            focusedBuilding.polygon.setVisible(false);
+            focusedBuilding.isFocused = true;
+
+            for (Building b : buildings)
+            {
+                if(b.getID() != focusedBuilding.getID())
+                {
+                    b.hideRooms();
+                    b.hideFloorPlans();
+                }
+            }
+
+            floorController.show(focusedBuilding);
+
+//                        floorController.show(focusedBuilding);
+//                        focusedBuilding.showRooms(floorController.closestFloor(focusedBuilding), getApplicationContext(), mMap);
+//                        focusedBuilding.showFloorPlans(floorController.closestFloor(focusedBuilding));
+
+            //focusedBuilding.showRooms(0, getApplicationContext(), mMap);
+            // focusedBuilding.pushOverFloorPlans();
+            //focusedBuilding.showFloorPlans();
+        }
     }
 
     /**
@@ -557,44 +578,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         b.polygon.setVisible( false );
                     }*/
 
-
-
-                    Building focusedBuilding = LatLngTools.findClosestBuilding(cameraPosition.target, buildings);
-
-                    if(!focusedBuilding.isFocused)
-                    {
-                        Log.d( "UCDetailedMaps", "Focused building changed. New target: " + focusedBuilding.getName());
-                        for( Building b : buildings )
-                        {
-                            b.polygon.setVisible( true );
-                            // b.polygon.setZIndex( 1f );
-                            b.isFocused = false;
-                        }
-                        focusedBuilding.polygon.setVisible(false);
-                        focusedBuilding.isFocused = true;
-
-                        for (Building b : buildings)
-                        {
-                            if(b.getID() != focusedBuilding.getID())
-                            {
-                                b.hideRooms();
-                                b.hideFloorPlans();
-                            }
-                        }
-
-
-                        floorController.show(focusedBuilding);
-
-
-//                        floorController.show(focusedBuilding);
-//                        focusedBuilding.showRooms(floorController.closestFloor(focusedBuilding), getApplicationContext(), mMap);
-//                        focusedBuilding.showFloorPlans(floorController.closestFloor(focusedBuilding));
-
-
-                        //focusedBuilding.showRooms(0, getApplicationContext(), mMap);
-                        // focusedBuilding.pushOverFloorPlans();
-                        //focusedBuilding.showFloorPlans();
-                    }
+                    updateBuildingFocus();
                 }
                 else
                 {

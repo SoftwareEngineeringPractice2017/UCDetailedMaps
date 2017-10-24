@@ -42,7 +42,7 @@ public class MenuAdapter extends ArrayAdapter<String>{
 
         CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
 
-        if(menuHandler.get(actualLocation).type == MenuItem.ItemType.Building)
+        if(menuHandler.get(actualLocation).type != MenuItem.ItemType.Icon)
         {
             checkBox.setVisibility(View.GONE);
             addSpaces = "  ";

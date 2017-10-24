@@ -1,5 +1,7 @@
 package com.example.olymbeastmk2.ucdetailedmaps;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +38,13 @@ public class MenuHandler {
         for( Building b : _buildings )
         {
             output.add( new MenuItem( b.getID(), b.getName() ) );
+            for(int floor : b.getRooms().keySet())
+            {
+                for(Room r : b.getRooms().get(floor))
+                {
+                    output.add(new MenuItem(r));
+                }
+            }
         }
 
         Collections.sort(output);
@@ -49,6 +58,8 @@ public class MenuHandler {
 
         menuItems = output;
         currentMenu = menuItems;
+
+        //filter("");
     }
 
     public void filter(String filter )
@@ -63,7 +74,26 @@ public class MenuHandler {
             if( m.text.toLowerCase().contains( filter ) )
             {
                 output.add( m );
+
             }
+        }
+
+        if(filter.isEmpty())
+        {
+            ArrayList< MenuItem > output2 = new ArrayList<>();
+            for(MenuItem m : output)
+            {
+                if(m.type != MenuItem.ItemType.Room)
+                {
+                    output2.add(m);
+                }
+                else
+                {
+                    Log.d( "UCDetailedMaps", "Skipped " + m.text);
+                }
+            }
+            currentMenu = output2;
+            return;
         }
 
         currentMenu = output;

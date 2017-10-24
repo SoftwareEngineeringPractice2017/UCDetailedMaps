@@ -1,18 +1,23 @@
 package com.example.olymbeastmk2.ucdetailedmaps;
 
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * Created by Riley on 19/09/2017.
  */
 
 public class MenuItem implements Comparable<MenuItem> {
 
-    public enum ItemType {Icon, Building}
+    public enum ItemType {Icon, Building, Room}
 
     int location;
     boolean checked;
     int id;
     ItemType type;
     String text;
+
+    int floor;
+    LatLng position;
 
     public MenuItem( int _id,  String _text)
     {
@@ -28,6 +33,15 @@ public class MenuItem implements Comparable<MenuItem> {
         type = ItemType.Icon;
         text = _text;
         checked = true;
+    }
+
+    public MenuItem(Room _Room)
+    {
+        id = _Room.getBuildingID();
+        type = ItemType.Room;
+        text = _Room.getFullName();
+        floor = _Room.getFloor();
+        position = _Room.getLocation();
     }
 
     public Integer getBuildingNumber()
@@ -70,6 +84,11 @@ public class MenuItem implements Comparable<MenuItem> {
         {
             return text.compareTo(m.text);
         }
+        else if (type == ItemType.Room)
+        {
+            return text.compareTo(m.text);
+        }
+
 
 //        if(hasBuildingNumber() != m.hasBuildingNumber())
 //        {

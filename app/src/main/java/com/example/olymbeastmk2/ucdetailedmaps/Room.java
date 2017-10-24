@@ -39,7 +39,9 @@ public class Room {
     private Marker marker;
     private boolean hasMarker;
 
-    public Room(int _ID, DbHelper _Parent)
+    private int buildingNumber;
+
+    public Room(int _ID, DbHelper _Parent, int _BuildingNumber)
     {
         id = _ID;
         parent = _Parent;
@@ -50,6 +52,8 @@ public class Room {
         hasLocation = false;
         hasTitle = false;
         hasMarker = false;
+
+        buildingNumber = _BuildingNumber;
     }
 
     public void Load()
@@ -68,10 +72,15 @@ public class Room {
         }
         Cursor res = parent.getReadableDatabase().rawQuery("select * from " + DbHelper.ROOMS_TABLE + " where " + DbHelper.ROOMS_ID + "=" + Integer.toString( id ), null);
         res.moveToFirst();
-        buildingID = res.getInt( res.getColumnIndex( DbHelper.BUILDING_NAME ) );
+        buildingID = res.getInt( res.getColumnIndex( DbHelper.ROOMS_BUILDING ) );
         res.close();
         hasBuildingID = true;
         return buildingID;
+    }
+
+    public String getFullName()
+    {
+        return Integer.toString(buildingNumber) + getTitle();
     }
 
     public int getFloor()
