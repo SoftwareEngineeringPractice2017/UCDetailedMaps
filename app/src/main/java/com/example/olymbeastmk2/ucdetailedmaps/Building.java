@@ -41,6 +41,9 @@ public class Building
     private ArrayList<FloorPlan> floorPlans;
     private boolean hasFloorPlans;
 
+    private HashMap<Integer, Floor> floors;
+    private boolean hasFloors;
+
     public Polygon polygon;
 
     public boolean isFocused;
@@ -55,16 +58,9 @@ public class Building
         hasEntries = false;
         hasRooms = false;
         hasFloorPlans = false;
+        hasFloors = false;
 
         isFocused = false;
-    }
-
-    public void Load()
-    {
-        getName();
-        getOutline();
-        getEntries();
-        getRooms();
     }
 
     public int getID()
@@ -168,6 +164,54 @@ public class Building
         return output;
     }
 
+    public HashMap<Integer, Floor> getFloors()
+    {
+        if(hasFloors)
+        {
+            return floors;
+        }
+
+        HashMap<Integer, Floor> output = new HashMap<Integer, Floor>();
+
+        for(FloorPlan fp : getFloorPlans())
+        {
+            output.put(fp.floor, new Floor(fp, fp.floor));
+        }
+
+        for(int floorKey : getRooms().keySet())
+        {
+            if(output.containsKey(floorKey))
+            {
+                output.get(floorKey).setRooms(getRooms().get(floorKey));
+            }
+            else
+            {
+                output.put(floorKey, new Floor(getRooms().get(floorKey), floorKey));
+            }
+        }
+
+
+        for(int key : output.keySet())
+        {
+            if(output.containsKey(key + 1))
+            {
+                output.get(key).hasUpper = true;
+            }
+
+            if(output.containsKey(key - 1))
+            {
+                output.get(key).hasLower = true;
+            }
+        }
+
+        floors = output;
+        hasFloors = true;
+        return floors;
+    }
+
+
+
+
     public ArrayList<FloorPlan> getFloorPlans()
     {
         if( hasFloorPlans )
@@ -205,6 +249,8 @@ public class Building
 
     public void showRooms(int floor, Context context, GoogleMap map)
     {
+        hideRooms();
+
         if(getRooms().containsKey(floor))
         {
             ArrayList<Room> rooms = getRooms().get(floor);
@@ -235,11 +281,18 @@ public class Building
         }
     }
 
-    public void showFloorPlans()
+    public void showFloorPlans(int _Floor)
     {
         for( FloorPlan fp : getFloorPlans() )
         {
-            fp.groundMapRef.setVisible( true );
+            if(fp.floor == _Floor)
+            {
+                fp.groundMapRef.setVisible( true );
+            }
+            else
+            {
+                fp.groundMapRef.setVisible( false );
+            }
         }
     }
 

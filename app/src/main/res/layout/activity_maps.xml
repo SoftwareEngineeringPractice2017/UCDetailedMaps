@@ -230,6 +230,31 @@
             android:layout_below="@id/FPBuildingFloorText"
             android:visibility="invisible"/>
 
+        <TextView
+            android:id="@+id/floordisp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/FPScaleText"
+            android:layout_centerHorizontal="true"
+            android:text="TextView" />
+
+        <Button
+            android:id="@+id/upbutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="12dp"
+            android:layout_toStartOf="@+id/floordisp"
+            android:text="Up" />
+
+        <Button
+            android:id="@+id/downbutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toEndOf="@+id/floordisp"
+            android:text="Down" />
+
         <!-- Left Button -->
         <!-- <android.support.design.widget.FloatingActionButton
             android:id="@+id/FPDownFAB"

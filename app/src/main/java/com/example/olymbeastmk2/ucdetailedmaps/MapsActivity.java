@@ -110,6 +110,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ArrayList< Building > buildings;
     private HashMap< String, ArrayList< Icon > > icons;
 
+    public FloorController floorController;
+
     private LatLng myLocation;
 
     public void getLastLocation()
@@ -483,6 +485,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( UCBruceCampus, zoomLevel ) );
 
 
+        floorController = new FloorController(this, this, getApplicationContext(), mMap);
+
 
         for( Building b : buildings )
         {
@@ -553,6 +557,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         b.polygon.setVisible( false );
                     }*/
 
+
+
                     Building focusedBuilding = LatLngTools.findClosestBuilding(cameraPosition.target, buildings);
 
                     if(!focusedBuilding.isFocused)
@@ -575,13 +581,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 b.hideFloorPlans();
                             }
                         }
-                        focusedBuilding.showRooms(0, getApplicationContext(), mMap);
+
+
+                        floorController.show(focusedBuilding);
+
+
+//                        floorController.show(focusedBuilding);
+//                        focusedBuilding.showRooms(floorController.closestFloor(focusedBuilding), getApplicationContext(), mMap);
+//                        focusedBuilding.showFloorPlans(floorController.closestFloor(focusedBuilding));
+
+
+                        //focusedBuilding.showRooms(0, getApplicationContext(), mMap);
                         // focusedBuilding.pushOverFloorPlans();
-                        focusedBuilding.showFloorPlans();
+                        //focusedBuilding.showFloorPlans();
                     }
                 }
                 else
                 {
+                    floorController.hide();
+
                     // Loop through all the Building Polygons, making them visible 
                     for( Building b : buildings )
                     {
