@@ -239,12 +239,12 @@ public class FloorController {
 
         for(FloorPlan fp : floorPlanArrayList)
         {
-            if(topFloor > fp.floor)
+            if(fp.floor > fp.floor)
             {
                 topFloor = fp.floor;
             }
 
-            if(bottomFloor < fp.floor)
+            if(fp.floor < bottomFloor)
             {
                 bottomFloor = fp.floor;
             }
@@ -261,37 +261,6 @@ public class FloorController {
         }
 
         return floor;
-    }
-
-    public String floorString(int _Floor)
-    {
-        switch (_Floor)
-        {
-            case -1 :
-                return "Basement";
-            case 0 :
-                return "Ground Floor";
-            case 1 :
-                return "First Floor";
-            case 2 :
-                return "Second Floor";
-            case 3 :
-                return "Third Floor";
-            case 4 :
-                return "Fourth Floor";
-            case 5 :
-                return "Fifth Floor";
-            case 6 :
-                return "Sixth Floor";
-            case 7 :
-                return "Seventh Floor";
-            case 8 :
-                return "Eighth Floor";
-            case 9 :
-                return "Ninth Floor";
-            default:
-                return "Error Floor";
-        }
     }
 
 }
