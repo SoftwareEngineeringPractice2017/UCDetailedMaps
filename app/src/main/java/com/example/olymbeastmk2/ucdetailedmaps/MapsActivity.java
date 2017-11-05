@@ -140,14 +140,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if( userLocMarker == null )
         {
             // Create a new marker
-            userLocMarker = mMap.addMarker( new MarkerOptions().position( userLocation ).icon( BitmapDescriptorFactory.fromResource( R.mipmap.panda ) ) );
+            //userLocMarker = mMap.addMarker( new MarkerOptions().position( userLocation ).icon( BitmapDescriptorFactory.fromResource( R.mipmap.panda ) ) );
 
             Log.d( "UCDetailedMaps", "CREATED A PANDA :D" + Double.toString( userLocation.latitude ) + Double.toString( userLocation.longitude ) );
         }
         // If the marker is already created, move it!
         else
         {
-            userLocMarker.setPosition( userLocation );
+            //userLocMarker.setPosition( userLocation );
 
             Log.d( "UCDetailedMaps", "UPDATED THE PANDA! AT" + Double.toString( userLocation.latitude ) + Double.toString( userLocation.longitude ) );
         }
@@ -224,6 +224,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         mapFragment.getMapAsync( this );
+
+
+        boolean enableDevTools = false;
+        if(!enableDevTools)
+        {
+            FloatingActionButton fabCoords = (FloatingActionButton) findViewById(R.id.debugFAB);
+            FloatingActionButton fabFloorMaps = (FloatingActionButton) findViewById(R.id.FPFAB);
+            fabCoords.setVisibility(View.INVISIBLE);
+            fabFloorMaps.setVisibility(View.INVISIBLE);
+        }
     }
 
     // Init Drawer
