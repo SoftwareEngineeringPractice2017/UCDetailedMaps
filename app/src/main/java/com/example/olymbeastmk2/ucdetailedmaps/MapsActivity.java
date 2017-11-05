@@ -3,6 +3,7 @@ package com.example.olymbeastmk2.ucdetailedmaps;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
@@ -217,7 +218,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         menuHandler.populate(buildings, icons);
 
         // Start updating the user's location
-        startLocationUpdates();
+        if( checkPermissions() )
+        {
+            startLocationUpdates();
+        }
 
         mapFragment.getMapAsync( this );
     }
@@ -395,10 +399,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Initialize Database helper for all database needs
         DbHelper dbBuildHelp = new DbHelper( this, "UCMapsDB", null, 1 );
 
+        SQLiteDatabase db = dbBuildHelp.getWritableDatabase();
         //Temporary code for development. The database is constant even after updates in code.
         //Therefore it is necessary to rebuild it each time the app is debugged, in case of changes.
         dbBuildHelp.ClearEverything();
-        dbBuildHelp.BuildEverything();
+        dbBuildHelp.BuildEverything( db );
 
         // Get the resources ( mainly for the CSV file at the moment )
         resources = getResources();

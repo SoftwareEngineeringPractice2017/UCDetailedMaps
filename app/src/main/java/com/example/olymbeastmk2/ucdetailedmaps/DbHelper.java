@@ -85,7 +85,8 @@ public class DbHelper extends SQLiteOpenHelper
     @Override
     public void onCreate( SQLiteDatabase db )
     {
-       BuildEverything();
+        // PASS THE DB TO BUILD EVERYTHING INSTEAD OF getDatabase inside of BuildEverything
+       BuildEverything( db );
     }
 
     @Override
@@ -106,9 +107,8 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL( "drop table if exists " + ROOMS_TABLE );
     }
 
-    public void BuildEverything()
+    public void BuildEverything( SQLiteDatabase db )
     {
-        SQLiteDatabase db = this.getReadableDatabase();
         //Create Buildings table.
         db.execSQL( "create table " + BUILDING_TABLE + "(" +
                 BUILDING_ID + " integer primary key, " +
